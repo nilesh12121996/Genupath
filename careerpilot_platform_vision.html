@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CareerPilot — Platform Vision</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f7f6f3;--surface:#ffffff;--surface2:#f0ede8;--surface3:#e8e4dc;
+  --ink:#1a1a18;--ink2:#3d3c38;--ink3:#6b6a64;--ink4:#9b9a94;
+  --teal:#00897a;--teal-l:#e0f5f2;--teal-m:#4db8ac;
+  --indigo:#3d4fd6;--indigo-l:#eaecfb;
+  --amber:#c47c00;--amber-l:#fff3d6;
+  --coral:#d44c2a;--coral-l:#fdeee9;
+  --green:#2d7a3a;--green-l:#eaf5ec;
+  --purple:#6b3fa0;--purple-l:#f3eefb;
+  --border:#dddad3;--border2:#ccc9c0;
+  --sans:'Inter',sans-serif;--display:'Syne',sans-serif;
+}
+html,body{height:100%;background:var(--bg);color:var(--ink);font-family:var(--sans);overflow:hidden}
+
+/* TABS */
+#nav{position:fixed;top:0;left:0;right:0;background:var(--surface);border-bottom:1px solid var(--border);z-index:100;display:flex;align-items:center;gap:0;padding:0 24px;height:52px}
+.logo{font-family:var(--display);font-size:16px;font-weight:800;color:var(--ink);margin-right:28px;letter-spacing:-.02em}
+.logo span{color:var(--teal)}
+.ntab{padding:0 16px;height:52px;display:flex;align-items:center;font-size:12px;font-weight:500;color:var(--ink3);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap}
+.ntab:hover{color:var(--ink)}
+.ntab.on{color:var(--teal);border-bottom-color:var(--teal);font-weight:600}
+.nav-right{margin-left:auto;display:flex;gap:8px}
+.nbtn{font-size:11px;font-weight:600;padding:6px 14px;border-radius:6px;cursor:pointer;border:none;font-family:var(--sans)}
+.nbtn.out{background:transparent;border:1px solid var(--border2);color:var(--ink2)}
+.nbtn.fill{background:var(--teal);color:#fff}
+
+/* PANELS */
+#panels{position:fixed;inset:0;top:52px;overflow-y:auto}
+.panel{display:none;padding:28px 32px 48px;max-width:1100px;margin:0 auto}
+.panel.on{display:block}
+
+/* SECTION HEADERS */
+.sh{font-family:var(--display);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink4);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.h1{font-family:var(--display);font-size:clamp(24px,3.5vw,40px);font-weight:800;color:var(--ink);line-height:1.1;letter-spacing:-.03em}
+.h2{font-family:var(--display);font-size:20px;font-weight:700;color:var(--ink);letter-spacing:-.02em}
+.body{font-size:13px;color:var(--ink3);line-height:1.7}
+
+/* GRID */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px}
+.card.teal{background:var(--teal-l);border-color:rgba(0,137,122,.2)}
+.card.indigo{background:var(--indigo-l);border-color:rgba(61,79,214,.2)}
+.card.amber{background:var(--amber-l);border-color:rgba(196,124,0,.2)}
+.card.coral{background:var(--coral-l);border-color:rgba(212,76,42,.2)}
+.card.green{background:var(--green-l);border-color:rgba(45,122,58,.2)}
+.card.purple{background:var(--purple-l);border-color:rgba(107,63,160,.2)}
+.ct{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:5px}
+.cs{font-size:12px;color:var(--ink3);line-height:1.6}
+
+/* TAGS */
+.tag{display:inline-block;font-size:10px;font-weight:600;padding:3px 9px;border-radius:20px;letter-spacing:.04em}
+.tag-teal{background:var(--teal-l);color:var(--teal);border:1px solid rgba(0,137,122,.25)}
+.tag-indigo{background:var(--indigo-l);color:var(--indigo);border:1px solid rgba(61,79,214,.2)}
+.tag-amber{background:var(--amber-l);color:var(--amber);border:1px solid rgba(196,124,0,.2)}
+.tag-coral{background:var(--coral-l);color:var(--coral);border:1px solid rgba(212,76,42,.2)}
+.tag-green{background:var(--green-l);color:var(--green);border:1px solid rgba(45,122,58,.2)}
+.tag-purple{background:var(--purple-l);color:var(--purple);border:1px solid rgba(107,63,160,.2)}
+
+/* PROBABILITY METER */
+.prob-meter{position:relative;height:10px;background:var(--surface2);border-radius:5px;overflow:hidden;margin:10px 0}
+.prob-fill{height:100%;border-radius:5px;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
+
+/* COMPETITOR CARD (mockup) */
+.comp-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.comp-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0}
+.comp-body{flex:1}
+.comp-name{font-size:12px;font-weight:600;color:var(--ink)}
+.comp-meta{font-size:11px;color:var(--ink3);margin-top:2px}
+.comp-score{font-family:'Syne',sans-serif;font-size:13px;font-weight:700}
+
+/* SIDE-BY-SIDE COMPARISON */
+.vs-row{display:flex;gap:0;margin-bottom:8px;border-radius:10px;overflow:hidden;border:1px solid var(--border)}
+.vs-col{flex:1;padding:12px 16px}
+.vs-col.bad{background:#fff8f6}
+.vs-col.good{background:#f5fbf9}
+.vs-col-head{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
+.vs-col.bad .vs-col-head{color:var(--coral)}
+.vs-col.good .vs-col-head{color:var(--teal)}
+.vs-divider{width:1px;background:var(--border);flex-shrink:0}
+.vs-item{font-size:12px;color:var(--ink3);margin-bottom:4px;display:flex;gap:6px;align-items:flex-start}
+.vs-item::before{content:'×';color:var(--coral);font-weight:700;flex-shrink:0}
+.vs-col.good .vs-item::before{content:'✓';color:var(--teal)}
+
+/* FEATURE ROW */
+.feat-row{display:flex;gap:12px;align-items:flex-start;padding:16px 0;border-bottom:1px solid var(--border)}
+.feat-row:last-child{border-bottom:none}
+.feat-num{font-family:var(--display);font-size:22px;font-weight:800;color:var(--border2);width:32px;flex-shrink:0;line-height:1}
+.feat-body{flex:1}
+.feat-title{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:4px}
+.feat-desc{font-size:12px;color:var(--ink3);line-height:1.65}
+.feat-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.feat-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-right:4px}
+
+/* PRICING */
+.price-card{background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:22px 22px 20px;position:relative}
+.price-card.featured{border-color:var(--teal);background:var(--teal-l)}
+.price-card.featured::before{content:'Most popular';position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:var(--teal);color:#fff;font-size:10px;font-weight:700;padding:3px 12px;border-radius:20px;letter-spacing:.05em}
+.price-name{font-family:var(--display);font-size:14px;font-weight:700;color:var(--ink);margin-bottom:6px}
+.price-val{font-family:var(--display);font-size:32px;font-weight:800;color:var(--ink);line-height:1}
+.price-val span{font-size:14px;font-weight:400;color:var(--ink3)}
+.price-desc{font-size:11px;color:var(--ink3);margin:8px 0 14px;line-height:1.6}
+.price-feat{font-size:11px;color:var(--ink2);margin-bottom:5px;display:flex;gap:7px}
+.price-feat::before{content:'✓';color:var(--teal);font-weight:700;flex-shrink:0}
+.price-cta{width:100%;padding:9px;border-radius:8px;font-size:12px;font-weight:600;border:none;cursor:pointer;font-family:var(--sans);margin-top:16px}
+.price-card:not(.featured) .price-cta{background:var(--surface2);color:var(--ink);border:1px solid var(--border)}
+.price-card.featured .price-cta{background:var(--teal);color:#fff}
+
+/* MOAT TABLE */
+.moat-table{width:100%;border-collapse:collapse;font-size:12px}
+.moat-table th{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);text-align:left;padding:8px 12px;background:var(--surface2);border-bottom:1px solid var(--border)}
+.moat-table td{padding:10px 12px;border-bottom:1px solid var(--border);color:var(--ink2);vertical-align:top;line-height:1.5}
+.moat-table tr:last-child td{border-bottom:none}
+.moat-table tr:hover td{background:var(--surface2)}
+.tick-yes{color:var(--teal);font-weight:700}
+.tick-no{color:var(--coral);font-weight:700}
+.tick-part{color:var(--amber);font-weight:700}
+
+/* MOCKUP UI */
+.mockup-shell{background:var(--surface2);border-radius:14px;padding:16px;border:1px solid var(--border)}
+.mockup-topbar{background:var(--surface);border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:10px;margin-bottom:12px;border:1px solid var(--border)}
+.mockup-dot{width:8px;height:8px;border-radius:50%}
+.url-bar{flex:1;background:var(--surface2);border-radius:4px;padding:4px 10px;font-size:10px;color:var(--ink3)}
+
+/* ANIMATED COUNTER */
+.counter{font-family:var(--display);font-size:36px;font-weight:800;color:var(--teal)}
+
+/* DATA FLYWHEEL */
+.flywheel{display:grid;grid-template-columns:1fr auto 1fr;gap:0;align-items:center;max-width:700px;margin:20px auto}
+.fw-col{display:flex;flex-direction:column;gap:8px}
+.fw-item{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--ink2)}
+.fw-item strong{color:var(--ink);display:block;font-size:11px;font-weight:600;margin-bottom:2px}
+.fw-center{display:flex;flex-direction:column;align-items:center;gap:6px;padding:0 20px}
+.fw-logo{width:56px;height:56px;background:var(--teal-l);border:2px solid rgba(0,137,122,.3);border-radius:14px;display:flex;align-items:center;justify-content:center}
+
+/* LEGAL SHIELD */
+.legal-row{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.legal-row:last-child{border-bottom:none}
+.legal-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.legal-body .lb-title{font-size:12px;font-weight:600;color:var(--ink);margin-bottom:3px}
+.legal-body .lb-desc{font-size:11px;color:var(--ink3);line-height:1.6}
+
+/* ROADMAP */
+.rm-phase{margin-bottom:20px}
+.rm-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.rm-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.rm-title{font-size:13px;font-weight:600;color:var(--ink)}
+.rm-period{font-size:11px;color:var(--ink4);margin-left:auto}
+.rm-items{display:flex;flex-wrap:wrap;gap:6px}
+.rm-item{font-size:11px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:4px 10px;color:var(--ink2)}
+
+/* PROBABILITY DEMO */
+.prob-demo{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:10px}
+.pd-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+.pd-company{font-size:14px;font-weight:600;color:var(--ink)}
+.pd-role{font-size:12px;color:var(--ink3);margin-top:2px}
+.pd-score{font-family:var(--display);font-size:28px;font-weight:800;text-align:right}
+.pd-label{font-size:10px;font-weight:600;text-align:right;margin-top:2px;text-transform:uppercase;letter-spacing:.06em}
+.pd-factors{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.pd-factor{background:var(--surface2);border-radius:6px;padding:8px 10px}
+.pf-label{font-size:10px;color:var(--ink3);margin-bottom:4px}
+.pf-bar{height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+.pf-fill{height:100%;border-radius:3px}
+.pf-val{font-size:10px;font-weight:600;margin-top:3px}
+
+/* COMPETITOR VIEW */
+.comp-viz{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.cv-head{background:var(--surface2);padding:10px 14px;font-size:11px;font-weight:600;color:var(--ink3);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.cv-body{padding:10px 14px}
+.cv-legend{display:flex;gap:12px;font-size:10px;color:var(--ink3);margin-top:6px}
+.cv-ld{display:flex;align-items:center;gap:4px}
+.cv-ld-dot{width:8px;height:8px;border-radius:50%}
+</style>
+</head>
+<body>
+
+<div id="nav">
+  <div class="logo">Career<span>Pilot</span></div>
+  <div class="ntab on" onclick="sw('vision')">Product Vision</div>
+  <div class="ntab" onclick="sw('features')">Core Features</div>
+  <div class="ntab" onclick="sw('legal')">Legal Design</div>
+  <div class="ntab" onclick="sw('mockups')">UI Mockups</div>
+  <div class="ntab" onclick="sw('moat')">Competitive Moat</div>
+  <div class="ntab" onclick="sw('pricing')">Business Model</div>
+  <div class="ntab" onclick="sw('roadmap')">Roadmap</div>
+  <div class="nav-right">
+    <button class="nbtn out">Share</button>
+    <button class="nbtn fill">Build This →</button>
+  </div>
+</div>
+
+<div id="panels">
+
+<!-- ══════════════════════════ VISION ══════════════════════════ -->
+<div class="panel on" id="p-vision">
+  <div style="margin-bottom:32px">
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+      <span class="tag tag-teal">Two-sided marketplace</span>
+      <span class="tag tag-indigo">B2B + B2C</span>
+      <span class="tag tag-green">100% legal</span>
+      <span class="tag tag-amber">Network effects</span>
+    </div>
+    <h1 class="h1" style="max-width:720px;margin-bottom:12px">The job market's first honest<br>intelligence platform</h1>
+    <p class="body" style="max-width:640px;font-size:14px">Candidates see their real probability of getting a role, who they're competing against, and where to focus energy. Companies get pre-qualified candidates who already match their requirements. Everyone wins from radical transparency.</p>
+  </div>
+
+  <!-- THE PIVOT -->
+  <div class="sh">The pivot — from stealth tool to transparent platform</div>
+  <div class="vs-row" style="margin-bottom:20px">
+    <div class="vs-col bad">
+      <div class="vs-col-head">Old design (stealth bot)</div>
+      <div class="vs-item">Scrapes job boards — ToS violations</div>
+      <div class="vs-item">Fakes human behavior to evade detection</div>
+      <div class="vs-item">Risks account bans for the user</div>
+      <div class="vs-item">Companies can't use it — adversarial</div>
+      <div class="vs-item">Single-player, can't scale to a business</div>
+      <div class="vs-item">Misrepresents candidates through automation</div>
+    </div>
+    <div class="vs-divider"></div>
+    <div class="vs-col good">
+      <div class="vs-col-head">New design (transparent platform)</div>
+      <div class="vs-item">Companies post jobs directly — no scraping</div>
+      <div class="vs-item">Official API integrations with ATS platforms</div>
+      <div class="vs-item">Companies pay for it — aligned incentives</div>
+      <div class="vs-item">Candidates opt-in to transparency — consent</div>
+      <div class="vs-item">Network effects grow the moat</div>
+      <div class="vs-item">Honest signal improves outcome for everyone</div>
+    </div>
+  </div>
+
+  <!-- THE FLYWHEEL -->
+  <div class="sh">The data flywheel — what makes this defensible</div>
+  <div class="flywheel">
+    <div class="fw-col">
+      <div class="fw-item"><strong>More candidates join</strong>More competition data available per role</div>
+      <div class="fw-item"><strong>Better probability models</strong>More applications → more outcome data to train on</div>
+      <div class="fw-item"><strong>Candidates get real signal</strong>Stop applying where probability &lt;10%. Save time.</div>
+    </div>
+    <div class="fw-center">
+      <div class="fw-logo">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M14 3L25 9V19L14 25L3 19V9L14 3Z" stroke="#00897a" stroke-width="1.5" fill="var(--teal-l)"/><circle cx="14" cy="14" r="4" fill="#00897a" opacity=".8"/></svg>
+      </div>
+      <div style="font-family:var(--display);font-size:10px;font-weight:800;color:var(--teal);letter-spacing:.1em;text-align:center;margin-top:6px">DATA<br>FLYWHEEL</div>
+      <div style="font-size:10px;color:var(--ink4);margin-top:4px;text-align:center">self-reinforcing<br>moat</div>
+    </div>
+    <div class="fw-col">
+      <div class="fw-item"><strong>Companies see candidate quality</strong>Pre-scored applicants, ranked by fit</div>
+      <div class="fw-item"><strong>More companies post jobs here</strong>Better job coverage attracts more candidates</div>
+      <div class="fw-item"><strong>H1B signal improves</strong>Real offer data refines sponsorship probability</div>
+    </div>
+  </div>
+
+  <!-- WHO BUYS IT -->
+  <div class="sh" style="margin-top:28px">Who buys it and why</div>
+  <div class="g3">
+    <div class="card indigo">
+      <div style="font-size:20px;margin-bottom:8px">👤</div>
+      <div class="ct" style="color:var(--indigo)">Job seekers on visa</div>
+      <p class="cs">F1/OPT/H4 candidates who can't afford to waste time on non-sponsors. Probability score + H1B gate saves them months of effort. <strong>Pain is acute, willingness to pay is high.</strong></p>
+      <div style="margin-top:10px"><span class="tag tag-indigo">$19/mo</span></div>
+    </div>
+    <div class="card teal">
+      <div style="font-size:20px;margin-bottom:8px">🎯</div>
+      <div class="ct" style="color:var(--teal)">Senior / competitive roles</div>
+      <p class="cs">People applying to FAANG and top-tier roles where competition is brutal. Seeing 847 applicants before applying changes behavior and improves targeting. <strong>Signal is the product.</strong></p>
+      <div style="margin-top:10px"><span class="tag tag-teal">$29/mo</span></div>
+    </div>
+    <div class="card amber">
+      <div style="font-size:20px;margin-bottom:8px">🏢</div>
+      <div class="ct" style="color:var(--amber)">HR teams & recruiters</div>
+      <p class="cs">Companies get pre-scored candidates who already match their ATS. Reduces sourcing time by 60%. Especially valuable for companies overwhelmed with irrelevant applications. <strong>Clear ROI.</strong></p>
+      <div style="margin-top:10px"><span class="tag tag-amber">$299/mo per seat</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ FEATURES ══════════════════════════ -->
+<div class="panel" id="p-features">
+  <div class="sh">Core features — what makes someone pay for this</div>
+
+  <div style="margin-bottom:28px">
+    <div class="feat-row">
+      <div class="feat-num">01</div>
+      <div class="feat-icon" style="background:var(--teal-l)"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="#00897a" stroke-width="1.5"/><path d="M10 6v4l3 3" stroke="#00897a" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+      <div class="feat-body">
+        <div class="feat-title">Application probability score — "Should I even apply?"</div>
+        <div class="feat-desc">Before a candidate applies, they see a real-time probability estimate: <strong>34% chance of progressing to phone screen</strong>. Calculated from: JD keyword match against their profile, number of current applicants, company's historical hiring patterns, H1B sponsorship likelihood, seniority gap, and location match. Like Zillow's Zestimate — not a guarantee, but an honest signal that changes behavior.</div>
+        <div class="feat-tags">
+          <span class="tag tag-teal">Candidate-facing</span>
+          <span class="tag tag-indigo">ML model</span>
+          <span class="tag tag-amber">Gets better with data</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="feat-row">
+      <div class="feat-num">02</div>
+      <div class="feat-icon" style="background:var(--indigo-l)"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="7" cy="8" r="3" stroke="#3d4fd6" stroke-width="1.4"/><circle cx="13" cy="8" r="3" stroke="#3d4fd6" stroke-width="1.4"/><path d="M3 16c0-2.2 1.8-4 4-4h6c2.2 0 4 1.8 4 4" stroke="#3d4fd6" stroke-width="1.4" stroke-linecap="round"/></svg></div>
+      <div class="feat-body">
+        <div class="feat-title">Anonymised competitor view — "Who am I up against?"</div>
+        <div class="feat-desc">Candidates see an aggregated, <strong>fully anonymised</strong> view of other applicants for the same role: distribution of years of experience, top skills in the pool, highest-represented previous companies, education levels. No individual profiles — only statistical distributions. Think of it like seeing the histogram of bids on a house, not who bid. This is the feature no one else has and everyone wants.</div>
+        <div class="feat-tags">
+          <span class="tag tag-indigo">Candidate-facing</span>
+          <span class="tag tag-green">Privacy-safe</span>
+          <span class="tag tag-amber">Needs volume to be useful</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="feat-row">
+      <div class="feat-num">03</div>
+      <div class="feat-icon" style="background:var(--green-l)"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="3" y="4" width="14" height="12" rx="2" stroke="#2d7a3a" stroke-width="1.4"/><path d="M7 9h6M7 12h4" stroke="#2d7a3a" stroke-width="1.4" stroke-linecap="round"/></svg></div>
+      <div class="feat-body">
+        <div class="feat-title">Honest resume optimisation — truthful, not fabricated</div>
+        <div class="feat-desc">Claude Sonnet rewrites your resume bullets to match JD language — but is constrained to your actual experience (the truthfulness gate). The key difference from the stealth tool: <strong>the candidate reviews every change before it goes out</strong>. It's an AI writing assistant, not an auto-submitter. This is fully legal, fully ethical, and something Word and Google Docs cannot do.</div>
+        <div class="feat-tags">
+          <span class="tag tag-teal">Candidate-facing</span>
+          <span class="tag tag-green">Fully legal</span>
+          <span class="tag tag-indigo">Claude Sonnet</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="feat-row">
+      <div class="feat-num">04</div>
+      <div class="feat-icon" style="background:var(--amber-l)"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 3l2.1 4.3 4.7.7-3.4 3.3.8 4.7L10 13.5l-4.2 2.5.8-4.7L3.2 8l4.7-.7L10 3z" stroke="#c47c00" stroke-width="1.4" stroke-linejoin="round"/></svg></div>
+      <div class="feat-body">
+        <div class="feat-title">Candidate quality score — for companies</div>
+        <div class="feat-desc">Every applicant who applies through CareerPilot arrives pre-scored on a 0–100 scale. HR teams see a ranked list of applicants, not a pile of PDFs. Score is computed from: JD keyword match, years of relevant experience, skills overlap, gap analysis, and historical signal (did similar profiles get hired elsewhere on the platform?). Companies don't buy resume parsing — they buy <strong>ranked, pre-screened candidates</strong>.</div>
+        <div class="feat-tags">
+          <span class="tag tag-amber">Company-facing</span>
+          <span class="tag tag-coral">ATS integration</span>
+          <span class="tag tag-indigo">Saves 60% sourcing time</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="feat-row">
+      <div class="feat-num">05</div>
+      <div class="feat-icon" style="background:var(--coral-l)"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2C5.6 2 2 5.6 2 10s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8z" stroke="#d44c2a" stroke-width="1.4"/><path d="M10 6v4l2.5 2.5" stroke="#d44c2a" stroke-width="1.4" stroke-linecap="round"/></svg></div>
+      <div class="feat-body">
+        <div class="feat-title">H1B sponsorship intelligence — real data, not guesses</div>
+        <div class="feat-desc">The platform maintains a live database of employer LCA filings from DOL OFLC, enriched with crowd-sourced sponsorship outcomes from CareerPilot users (anonymised). A candidate sees: <em>"Google sponsored 847 H1B visas last year. 94% of CareerPilot users who reached final round at Google received an offer with sponsorship."</em> This is the most valuable signal for the F1/OPT community and does not exist anywhere else in this form.</div>
+        <div class="feat-tags">
+          <span class="tag tag-coral">Visa candidates</span>
+          <span class="tag tag-green">DOL OFLC data</span>
+          <span class="tag tag-amber">Crowd-sourced enrichment</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="feat-row">
+      <div class="feat-num">06</div>
+      <div class="feat-icon" style="background:var(--purple-l)"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 6h12M4 10h8M4 14h10" stroke="#6b3fa0" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+      <div class="feat-body">
+        <div class="feat-title">Interview prep + offer prediction — after the application</div>
+        <div class="feat-desc">When an interview is booked, the system auto-generates JD-specific STAR questions, technical prep, and a company brief. After the interview, candidates log how it went — this feeds the outcome prediction model. Over time CareerPilot can predict: <em>"Based on your interview description, you have a 61% chance of receiving an offer."</em> No other platform has post-application intelligence.</div>
+        <div class="feat-tags">
+          <span class="tag tag-purple">Post-application</span>
+          <span class="tag tag-teal">Outcome learning</span>
+          <span class="tag tag-indigo">Closes the full loop</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ LEGAL ══════════════════════════ -->
+<div class="panel" id="p-legal">
+  <div class="sh">Legal architecture — how every feature is defensible</div>
+
+  <div class="g2" style="margin-bottom:24px">
+    <div>
+      <p class="body" style="margin-bottom:16px">The original design's scraping approach would have resulted in cease-and-desist letters from LinkedIn, Indeed, and major ATS providers within weeks. The new architecture eliminates every legal risk by inverting the relationship: <strong>platforms give us data because they want to, not because we take it.</strong></p>
+      <div class="card green" style="margin-bottom:12px">
+        <div class="ct" style="color:var(--green)">Core legal principle</div>
+        <p class="cs">Every data flow is either (a) official API with terms agreed to, (b) user-consented data about themselves, or (c) publicly available government datasets. No scraping of user profiles. No fake browser sessions. No ToS violations.</p>
+      </div>
+      <div class="card teal">
+        <div class="ct" style="color:var(--teal)">Why companies will embrace this</div>
+        <p class="cs">Companies are <em>drowning</em> in irrelevant applications. A platform that pre-screens candidates and sends ranked, scored applicants directly to their ATS is a product they will pay for. We become a sourcing channel, not an adversary.</p>
+      </div>
+    </div>
+    <div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden">
+        <div style="background:var(--surface2);padding:10px 14px;font-size:11px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--border)">Every data source, legally justified</div>
+        <div style="padding:14px 16px">
+          <div class="legal-row">
+            <div class="legal-icon" style="background:var(--green-l)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 8h12M8 2v12" stroke="#2d7a3a" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+            <div class="legal-body"><div class="lb-title">Job postings from companies</div><div class="lb-desc">Companies post directly via our API or integrate their ATS (Greenhouse, Lever, Workday webhooks). They consent to their jobs being listed. Zero scraping.</div></div>
+          </div>
+          <div class="legal-row">
+            <div class="legal-icon" style="background:var(--teal-l)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#00897a" stroke-width="1.4"/><path d="M5.5 8l2 2 3-3" stroke="#00897a" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="legal-body"><div class="lb-title">Candidate profile data</div><div class="lb-desc">Candidates upload their own resume and enter their own data. They explicitly consent to it being used for matching and anonymised competitor analytics. GDPR-compliant with right-to-delete.</div></div>
+          </div>
+          <div class="legal-row">
+            <div class="legal-icon" style="background:var(--indigo-l)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="4" width="12" height="8" rx="1.5" stroke="#3d4fd6" stroke-width="1.4"/><path d="M5 7h6M5 10h4" stroke="#3d4fd6" stroke-width="1.4" stroke-linecap="round"/></svg></div>
+            <div class="legal-body"><div class="lb-title">H1B sponsorship data</div><div class="lb-desc">DOL OFLC H1B Disclosure Data is a US government public dataset — free to use commercially. We enrich it with consented outcome data from users who opt in to share results.</div></div>
+          </div>
+          <div class="legal-row">
+            <div class="legal-icon" style="background:var(--amber-l)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2l1.8 3.6 4 .6-2.9 2.8.7 4-3.6-1.9-3.6 1.9.7-4L2.2 6.2l4-.6L8 2z" stroke="#c47c00" stroke-width="1.4" stroke-linejoin="round"/></svg></div>
+            <div class="legal-body"><div class="lb-title">Competitor view analytics</div><div class="lb-desc">Only statistical distributions of anonymised data — no individual profiles exposed. Similar to how Glassdoor shows salary distributions. GDPR Article 89 research exemption applies where needed.</div></div>
+          </div>
+          <div class="legal-row" style="border-bottom:none">
+            <div class="legal-icon" style="background:var(--coral-l)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2C5.8 2 4 3.8 4 6c0 3 4 8 4 8s4-5 4-8c0-2.2-1.8-4-4-4z" stroke="#d44c2a" stroke-width="1.4"/><circle cx="8" cy="6" r="1.5" fill="#d44c2a"/></svg></div>
+            <div class="legal-body"><div class="lb-title">Company data (Crunchbase, Glassdoor)</div><div class="lb-desc">We use official APIs with agreed terms. Glassdoor API is available to approved partners. Crunchbase has a commercial API. No scraping — API relationships are part of the business BD roadmap.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sh">What we explicitly do NOT do (and why that's a moat)</div>
+  <div class="g3">
+    <div class="card coral">
+      <div class="ct" style="color:var(--coral)">No fake browser sessions</div>
+      <p class="cs">Every application is submitted by the actual candidate via their own authenticated session, or via official ATS API integration. No Playwright. No proxy rotation. No impersonation.</p>
+    </div>
+    <div class="card coral">
+      <div class="ct" style="color:var(--coral)">No automated submissions without review</div>
+      <p class="cs">The platform prepares the application — resume tailored, cover letter drafted — but the candidate clicks Submit. They see what's going out. This is the critical legal and ethical boundary.</p>
+    </div>
+    <div class="card coral">
+      <div class="ct" style="color:var(--coral)">No scraping competitor profiles</div>
+      <p class="cs">We never scrape LinkedIn or any platform for other people's data. The competitor view is built exclusively from our own users who consent to their anonymised data being included in aggregate statistics.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ MOCKUPS ══════════════════════════ -->
+<div class="panel" id="p-mockups">
+  <div class="sh">Key UI screens — the candidate experience</div>
+  <div class="g2" style="gap:20px">
+
+    <!-- PROBABILITY SCREEN -->
+    <div>
+      <div style="font-size:12px;font-weight:600;color:var(--ink);margin-bottom:10px">Screen 1 — Probability score before applying</div>
+      <div class="prob-demo">
+        <div class="pd-head">
+          <div>
+            <div class="pd-company">Stripe</div>
+            <div class="pd-role">Senior Software Engineer · San Francisco</div>
+            <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
+              <span class="tag tag-teal">Sponsors H1B</span>
+              <span class="tag tag-indigo">847 applicants</span>
+              <span class="tag tag-amber">High competition</span>
+            </div>
+          </div>
+          <div>
+            <div class="pd-score" style="color:var(--teal)">34%</div>
+            <div class="pd-label" style="color:var(--teal)">phone screen probability</div>
+          </div>
+        </div>
+        <div class="prob-meter"><div class="prob-fill" style="width:34%;background:linear-gradient(90deg,var(--amber),var(--teal))"></div></div>
+        <div class="pd-factors">
+          <div class="pd-factor"><div class="pf-label">JD keyword match</div><div class="pf-bar"><div class="pf-fill" style="width:72%;background:var(--teal)"></div></div><div class="pf-val" style="color:var(--teal)">72%</div></div>
+          <div class="pd-factor"><div class="pf-label">Experience level match</div><div class="pf-bar"><div class="pf-fill" style="width:85%;background:var(--teal)"></div></div><div class="pf-val" style="color:var(--teal)">85%</div></div>
+          <div class="pd-factor"><div class="pf-label">Competition level</div><div class="pf-bar"><div class="pf-fill" style="width:22%;background:var(--coral)"></div></div><div class="pf-val" style="color:var(--coral)">High — 847 applicants</div></div>
+          <div class="pd-factor"><div class="pf-label">H1B sponsorship</div><div class="pf-bar"><div class="pf-fill" style="width:92%;background:var(--teal)"></div></div><div class="pf-val" style="color:var(--teal)">92% historical rate</div></div>
+        </div>
+        <div style="margin-top:12px;display:flex;gap:8px">
+          <button style="flex:1;padding:9px;background:var(--teal);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer">Apply with optimised resume</button>
+          <button style="padding:9px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;font-size:12px;color:var(--ink2);cursor:pointer">See similar roles</button>
+        </div>
+      </div>
+
+      <!-- SECOND PROB CARD (low) -->
+      <div class="prob-demo" style="opacity:.8">
+        <div class="pd-head">
+          <div>
+            <div class="pd-company">Goldman Sachs</div>
+            <div class="pd-role">Software Engineer · New York</div>
+            <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
+              <span class="tag tag-coral">Rarely sponsors H1B</span>
+              <span class="tag tag-indigo">2,341 applicants</span>
+            </div>
+          </div>
+          <div>
+            <div class="pd-score" style="color:var(--coral)">6%</div>
+            <div class="pd-label" style="color:var(--coral)">phone screen probability</div>
+          </div>
+        </div>
+        <div class="prob-meter"><div class="prob-fill" style="width:6%;background:var(--coral)"></div></div>
+        <div style="margin-top:8px;background:var(--coral-l);border-radius:6px;padding:8px 10px;font-size:11px;color:var(--coral)"><strong>CareerPilot recommends skipping this application.</strong> 2,341 applicants for 3 open roles, Goldman Sachs has sponsored only 12 H1B visas in the past 2 years, and your profile has a 54% skills gap vs requirements.</div>
+      </div>
+    </div>
+
+    <!-- COMPETITOR VIEW -->
+    <div>
+      <div style="font-size:12px;font-weight:600;color:var(--ink);margin-bottom:10px">Screen 2 — Who you're competing against (anonymised)</div>
+      <div class="comp-viz" style="margin-bottom:12px">
+        <div class="cv-head">
+          <span>Stripe · SWE · 847 applicants in pool</span>
+          <span class="tag tag-indigo">anonymised · aggregate only</span>
+        </div>
+        <div class="cv-body">
+          <div style="font-size:11px;font-weight:600;color:var(--ink3);margin-bottom:8px">Years of experience distribution</div>
+          <div style="display:flex;gap:4px;align-items:flex-end;height:60px;margin-bottom:4px">
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px">
+              <div style="flex:1;width:100%;background:var(--border);border-radius:3px 3px 0 0;display:flex;flex-direction:column;justify-content:flex-end"><div style="height:20%;background:var(--indigo-l);border-radius:3px 3px 0 0;border:1px solid rgba(61,79,214,.3)"></div></div>
+              <div style="font-size:9px;color:var(--ink4)">0–2y</div>
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px">
+              <div style="flex:1;width:100%;background:var(--border);border-radius:3px 3px 0 0;display:flex;flex-direction:column;justify-content:flex-end"><div style="height:55%;background:var(--indigo-l);border-radius:3px 3px 0 0;border:1px solid rgba(61,79,214,.3)"></div></div>
+              <div style="font-size:9px;color:var(--ink4)">3–5y</div>
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;position:relative">
+              <div style="flex:1;width:100%;background:var(--border);border-radius:3px 3px 0 0;display:flex;flex-direction:column;justify-content:flex-end"><div style="height:100%;background:rgba(0,137,122,.25);border-radius:3px 3px 0 0;border:2px solid var(--teal)"></div></div>
+              <div style="font-size:9px;color:var(--teal);font-weight:700">5–8y ← you</div>
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px">
+              <div style="flex:1;width:100%;background:var(--border);border-radius:3px 3px 0 0;display:flex;flex-direction:column;justify-content:flex-end"><div style="height:70%;background:var(--indigo-l);border-radius:3px 3px 0 0;border:1px solid rgba(61,79,214,.3)"></div></div>
+              <div style="font-size:9px;color:var(--ink4)">8–12y</div>
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px">
+              <div style="flex:1;width:100%;background:var(--border);border-radius:3px 3px 0 0;display:flex;flex-direction:column;justify-content:flex-end"><div style="height:35%;background:var(--indigo-l);border-radius:3px 3px 0 0;border:1px solid rgba(61,79,214,.3)"></div></div>
+              <div style="font-size:9px;color:var(--ink4)">12y+</div>
+            </div>
+          </div>
+
+          <div style="font-size:11px;font-weight:600;color:var(--ink3);margin:10px 0 6px">Top 5 previous companies in pool</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            <span class="tag tag-indigo">Google · 94 applicants</span>
+            <span class="tag tag-indigo">Meta · 67 applicants</span>
+            <span class="tag tag-indigo">Amazon · 88 applicants</span>
+            <span class="tag tag-indigo">Microsoft · 71 applicants</span>
+            <span class="tag tag-indigo">Startups · 312 applicants</span>
+          </div>
+
+          <div style="font-size:11px;font-weight:600;color:var(--ink3);margin:10px 0 6px">Top skills in applicant pool</div>
+          <div style="display:flex;flex-wrap:wrap;gap:5px">
+            <span class="tag tag-teal">Python 78%</span>
+            <span class="tag tag-teal">Distributed systems 65%</span>
+            <span class="tag tag-teal">Go 54%</span>
+            <span class="tag tag-amber">Kubernetes 41%</span>
+            <span class="tag tag-coral">Rust 18%</span>
+          </div>
+          <div style="margin-top:10px;font-size:10px;color:var(--ink4)">Individual profiles never shown. All data anonymised and aggregated from candidates who consent to pool analytics.</div>
+        </div>
+      </div>
+
+      <!-- YOUR POSITION -->
+      <div style="background:var(--teal-l);border:1px solid rgba(0,137,122,.2);border-radius:10px;padding:12px 14px">
+        <div style="font-size:11px;font-weight:600;color:var(--teal);margin-bottom:6px">Your position in this pool</div>
+        <div style="font-size:12px;color:var(--ink2);line-height:1.6">You are in the <strong>top 28%</strong> of applicants by JD keyword match. Your experience level (6 years) is well-matched. Your main gap vs. the top 10% of applicants: <strong>distributed systems depth</strong> and <strong>Go experience</strong>. Adding these to your resume (if genuinely present) would move you to top 15%.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ MOAT ══════════════════════════ -->
+<div class="panel" id="p-moat">
+  <div class="sh">Competitive analysis — why this wins</div>
+  <div style="margin-bottom:20px">
+    <table class="moat-table">
+      <thead>
+        <tr>
+          <th style="width:22%">Feature</th>
+          <th style="width:13%">CareerPilot</th>
+          <th style="width:13%">LinkedIn</th>
+          <th style="width:13%">Indeed</th>
+          <th style="width:13%">Glassdoor</th>
+          <th style="width:13%">Handshake</th>
+          <th style="width:13%">Levels.fyi</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Application probability score</strong></td><td class="tick-yes">✓ ML model</td><td class="tick-part">~ Easy Apply indicator only</td><td class="tick-no">✗</td><td class="tick-no">✗</td><td class="tick-no">✗</td><td class="tick-no">✗</td></tr>
+        <tr><td><strong>Anonymised competitor view</strong></td><td class="tick-yes">✓ unique</td><td class="tick-part">~ applicant count only</td><td class="tick-no">✗</td><td class="tick-no">✗</td><td class="tick-no">✗</td><td class="tick-no">✗</td></tr>
+        <tr><td><strong>H1B sponsorship intelligence</strong></td><td class="tick-yes">✓ DOL + outcomes</td><td class="tick-no">✗</td><td class="tick-no">✗</td><td class="tick-no">✗</td><td class="tick-no">✗</td><td class="tick-part">~ salary only</td></tr>
+        <tr><td><strong>AI resume optimisation</strong></td><td class="tick-yes">✓ truthful</td><td class="tick-part">~ AI suggestions only</td><td class="tick-no">✗</td><td class="tick-no">✗</td><td class="tick-no">✗</td><td class="tick-no">✗</td></tr>
+        <tr><td><strong>Pre-screened candidates for employers</strong></td><td class="tick-yes">✓ ranked + scored</td><td class="tick-part">~ Recruiter tool (expensive)</td><td class="tick-part">~ Sponsored listings</td><td class="tick-no">✗</td><td class="tick-part">~ Campus recruiting</td><td class="tick-no">✗</td></tr>
+        <tr><td><strong>Interview prep from job data</strong></td><td class="tick-yes">✓ JD-specific</td><td class="tick-no">✗</td><td class="tick-no">✗</td><td class="tick-part">~ Generic Q&A bank</td><td class="tick-no">✗</td><td class="tick-no">✗</td></tr>
+        <tr><td><strong>Outcome prediction (offer probability)</strong></td><td class="tick-yes">✓ post-interview</td><td class="tick-no">✗</td><td class="tick-no">✗</td><td class="tick-no">✗</td><td class="tick-no">✗</td><td class="tick-no">✗</td></tr>
+        <tr><td><strong>Free for candidates (freemium)</strong></td><td class="tick-yes">✓ base tier free</td><td class="tick-yes">✓</td><td class="tick-yes">✓</td><td class="tick-yes">✓</td><td class="tick-yes">✓</td><td class="tick-yes">✓</td></tr>
+        <tr><td><strong>Two-sided marketplace flywheel</strong></td><td class="tick-yes">✓ candidates + companies</td><td class="tick-yes">✓ but saturated</td><td class="tick-yes">✓ but commodity</td><td class="tick-part">~ reviews only</td><td class="tick-part">~ students only</td><td class="tick-no">✗ data site only</td></tr>
+        <tr><td><strong>Works for visa candidates specifically</strong></td><td class="tick-yes">✓ core differentiator</td><td class="tick-part">~ generic</td><td class="tick-no">✗</td><td class="tick-no">✗</td><td class="tick-no">✗</td><td class="tick-no">✗</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sh">The moat — what makes this hard to copy</div>
+  <div class="g3">
+    <div class="card indigo">
+      <div class="ct" style="color:var(--indigo)">Data network effect</div>
+      <p class="cs">The probability model and competitor view only get accurate with volume. The first 10,000 users create a dataset that makes the product dramatically better than it was at 1,000. This is a classic data moat — incumbents can't copy it without the historical data.</p>
+    </div>
+    <div class="card amber">
+      <div class="ct" style="color:var(--amber)">Outcome data monopoly</div>
+      <p class="cs">Every time a CareerPilot user gets an offer, rejects an offer, or gets rejected, that outcome is (with consent) fed back into the model. After 2 years of operation, the offer prediction accuracy is effectively impossible to replicate without re-running 2 years of history.</p>
+    </div>
+    <div class="card teal">
+      <div class="ct" style="color:var(--teal)">H1B community ownership</div>
+      <p class="cs">The F1/OPT/H4 community is underserved, tightly networked, and has extremely high willingness to pay for accurate sponsorship intelligence. Once CareerPilot becomes the go-to for this community, word-of-mouth CAC drops to near-zero.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ PRICING ══════════════════════════ -->
+<div class="panel" id="p-pricing">
+  <div class="sh">Business model — how revenue is generated</div>
+
+  <div class="g4" style="margin-bottom:28px">
+    <div class="price-card">
+      <div class="price-name">Free</div>
+      <div class="price-val">$0<span>/mo</span></div>
+      <div class="price-desc">Core features to get started. No credit card.</div>
+      <div class="price-feat">Resume keyword analysis (3/mo)</div>
+      <div class="price-feat">Application probability score (5/mo)</div>
+      <div class="price-feat">H1B check (basic)</div>
+      <div class="price-feat">Applicant count per role</div>
+      <button class="price-cta">Get started</button>
+    </div>
+    <div class="price-card featured">
+      <div class="price-name">Candidate Pro</div>
+      <div class="price-val">$19<span>/mo</span></div>
+      <div class="price-desc">Full intelligence suite for active job seekers.</div>
+      <div class="price-feat">Unlimited probability scores</div>
+      <div class="price-feat">Full competitor view analytics</div>
+      <div class="price-feat">AI resume optimiser (unlimited)</div>
+      <div class="price-feat">H1B intelligence + crowd data</div>
+      <div class="price-feat">Interview prep pack per application</div>
+      <div class="price-feat">Offer probability predictor</div>
+      <button class="price-cta">Start free trial</button>
+    </div>
+    <div class="price-card">
+      <div class="price-name">Recruiter</div>
+      <div class="price-val">$149<span>/seat/mo</span></div>
+      <div class="price-desc">Pre-screened candidate pipeline for hiring teams.</div>
+      <div class="price-feat">Ranked, scored applicant dashboard</div>
+      <div class="price-feat">ATS integration (Greenhouse, Lever)</div>
+      <div class="price-feat">Candidate quality analytics</div>
+      <div class="price-feat">Diversity pipeline metrics</div>
+      <div class="price-feat">Bulk outreach to matched candidates</div>
+      <button class="price-cta">Book a demo</button>
+    </div>
+    <div class="price-card">
+      <div class="price-name">Enterprise</div>
+      <div class="price-val">$999<span>/mo</span></div>
+      <div class="price-desc">Full platform access for high-volume hiring orgs.</div>
+      <div class="price-feat">Unlimited recruiter seats</div>
+      <div class="price-feat">Custom ATS + HRIS integrations</div>
+      <div class="price-feat">Private job posting (unlisted)</div>
+      <div class="price-feat">Dedicated success manager</div>
+      <div class="price-feat">Custom probability model tuning</div>
+      <button class="price-cta">Contact sales</button>
+    </div>
+  </div>
+
+  <div class="sh">Revenue projections — conservative case</div>
+  <div class="g3">
+    <div class="card">
+      <div class="ct">Month 6 (early traction)</div>
+      <div style="font-family:var(--display);font-size:28px;font-weight:800;color:var(--teal);margin:8px 0">$14k MRR</div>
+      <p class="cs">500 Pro subscribers ($9.5k) + 3 Recruiter seats ($450) + 5 early enterprise deals ($4k). Realistic with 5,000 registered users and a 10% conversion.</p>
+    </div>
+    <div class="card">
+      <div class="ct">Month 18 (product-market fit)</div>
+      <div style="font-family:var(--display);font-size:28px;font-weight:800;color:var(--teal);margin:8px 0">$180k MRR</div>
+      <p class="cs">5,000 Pro subs ($95k) + 100 recruiter seats ($15k) + 35 enterprise ($35k) + 25 agency resellers ($35k). Driven by H1B community word-of-mouth.</p>
+    </div>
+    <div class="card">
+      <div class="ct">Month 36 (scale)</div>
+      <div style="font-family:var(--display);font-size:28px;font-weight:800;color:var(--teal);margin:8px 0">$1.2M MRR</div>
+      <p class="cs">30k Pro subs ($570k) + 600 recruiter seats ($90k) + 150 enterprise ($150k) + data licensing to research firms + API access tier ($390k combined).</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ ROADMAP ══════════════════════════ -->
+<div class="panel" id="p-roadmap">
+  <div class="sh">Build roadmap — what to ship and when</div>
+
+  <div class="rm-phase">
+    <div class="rm-head"><div class="rm-dot" style="background:var(--teal)"></div><div class="rm-title">Phase 0 · Foundation (Weeks 1–4) — $0 revenue, building the moat</div><div class="rm-period">Month 1</div></div>
+    <div class="rm-items">
+      <div class="rm-item">Resume parser (Claude Sonnet)</div>
+      <div class="rm-item">DOL OFLC H1B database loaded</div>
+      <div class="rm-item">Basic probability score (keyword match only)</div>
+      <div class="rm-item">Manual job submission (user clicks apply)</div>
+      <div class="rm-item">Auth + user profiles</div>
+      <div class="rm-item">Waitlist with referral loop</div>
+    </div>
+  </div>
+
+  <div class="rm-phase">
+    <div class="rm-head"><div class="rm-dot" style="background:var(--indigo)"></div><div class="rm-title">Phase 1 · Candidate MVP (Weeks 5–10) — Launch to beta users</div><div class="rm-period">Month 2–3</div></div>
+    <div class="rm-items">
+      <div class="rm-item">AI resume optimiser (with review before apply)</div>
+      <div class="rm-item">Full probability model (competition + H1B + match)</div>
+      <div class="rm-item">Applicant pool size display (pulls from our DB)</div>
+      <div class="rm-item">Cover letter generator</div>
+      <div class="rm-item">Interview prep pack on application</div>
+      <div class="rm-item">Freemium paywall + Stripe billing</div>
+    </div>
+  </div>
+
+  <div class="rm-phase">
+    <div class="rm-head"><div class="rm-dot" style="background:var(--amber)"></div><div class="rm-title">Phase 2 · Competitor View (Weeks 11–16) — The killer feature</div><div class="rm-period">Month 3–4</div></div>
+    <div class="rm-items">
+      <div class="rm-item">Anonymised competitor distribution charts</div>
+      <div class="rm-item">Opt-in consent flow for pool analytics</div>
+      <div class="rm-item">Skills gap analysis vs pool</div>
+      <div class="rm-item">Previous company distribution</div>
+      <div class="rm-item">YoE distribution histogram</div>
+      <div class="rm-item">Privacy audit + legal sign-off</div>
+    </div>
+  </div>
+
+  <div class="rm-phase">
+    <div class="rm-head"><div class="rm-dot" style="background:var(--coral)"></div><div class="rm-title">Phase 3 · Company Side (Weeks 17–24) — Revenue inflection point</div><div class="rm-period">Month 5–6</div></div>
+    <div class="rm-items">
+      <div class="rm-item">Company job posting portal</div>
+      <div class="rm-item">Greenhouse + Lever webhook integrations</div>
+      <div class="rm-item">Ranked applicant dashboard for recruiters</div>
+      <div class="rm-item">Candidate quality scores visible to HR</div>
+      <div class="rm-item">Recruiter tier pricing + billing</div>
+      <div class="rm-item">First enterprise pilot (5 companies free for data)</div>
+    </div>
+  </div>
+
+  <div class="rm-phase">
+    <div class="rm-head"><div class="rm-dot" style="background:var(--purple)"></div><div class="rm-title">Phase 4 · Intelligence Layer (Month 7–12) — The true moat</div><div class="rm-period">Month 7–12</div></div>
+    <div class="rm-items">
+      <div class="rm-item">Offer outcome data collection (consented)</div>
+      <div class="rm-item">Offer probability predictor (post-interview)</div>
+      <div class="rm-item">H1B crowd-sourced outcome enrichment</div>
+      <div class="rm-item">A/B resume strategy framework</div>
+      <div class="rm-item">API tier for third-party developers</div>
+      <div class="rm-item">Data licensing to research institutions</div>
+    </div>
+  </div>
+
+  <div class="card amber" style="margin-top:8px">
+    <div class="ct" style="color:var(--amber)">The most important thing to build first (Week 1, Day 1)</div>
+    <p class="cs">A waitlist page with a live counter of people waiting. The message: <em>"See your real probability of getting any job before you apply. CareerPilot uses AI + real applicant data to tell you where to focus."</em> Share it in r/f1visa, r/OPT, r/cscareerquestions, LinkedIn. The waitlist itself is your market validation. If you can't get 500 signups in 2 weeks from that community, you need to rethink the positioning.</p>
+  </div>
+</div>
+
+</div><!-- /panels -->
+
+<script>
+function sw(id){
+  document.querySelectorAll('.ntab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  event.target.classList.add('on');
+  document.getElementById('p-'+id).classList.add('on');
+}
+</script>
+</body>
+</html>

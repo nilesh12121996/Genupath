@@ -1,0 +1,139 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>CareerPilot 2026 Architecture</title>
+<style>
+*{box-sizing:border-box}
+body{background-color:#FAFAFA; padding: 20px; color: #333;}
+.w{max-width: 900px; margin: 0 auto; padding:6px 0 16px;font-family: system-ui, -apple-system, sans-serif}
+.header{text-align: center; margin-bottom: 40px;}
+.header h1{margin: 0; font-size: 28px; color: #111;}
+.header p{margin: 10px 0 0; color: #666; font-size: 16px;}
+.ll{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin:24px 0 8px 2px;color:#333}
+.row{display:flex;gap:12px;margin-bottom:12px; flex-wrap: wrap;}
+.card{border-radius:10px;padding:14px 16px;flex:1; min-width: 250px; cursor:pointer;border:1.5px solid transparent;transition:all .2s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.04); background: #fff;}
+.card:hover{transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.08);}
+.ct{font-size:14px;font-weight:600;margin:0 0 6px;color:#111}
+.cs{font-size:12px;line-height:1.5;margin:0;color:#444;opacity:.9}
+.ex{display:none;margin-top:12px;padding-top:10px;border-top:1.5px solid rgba(0,0,0,.08);font-size:12px;color:#333;line-height:1.6}
+.ex ul{margin:4px 0 0;padding-left:18px}
+.ex li{margin-bottom:6px}
+.card.open .ex{display:block}
+.badge{display:inline-block;font-size:10px;font-weight:600;padding:3px 8px;border-radius:12px;margin-left:6px;vertical-align:middle; text-transform: uppercase; letter-spacing: 0.05em;}
+
+.bn{background:#0F6E56;color:#fff}
+.bf{background:#854F0B;color:#fff}
+.bs{background:#3C3489;color:#fff}
+
+.teal{background:#E6F7F2;border-color:#9FE1CB}
+.teal .ct{color:#04342C}
+.purple{background:#F0EFFF;border-color:#AFA9EC}
+.purple .ct{color:#26215C}
+.coral{background:#FFEEE8;border-color:#F0997B}
+.coral .ct{color:#4A1B0C}
+.amber{background:#FFF5E6;border-color:#FAC775}
+.amber .ct{color:#412402}
+.blue{background:#EBF5FF;border-color:#85B7EB}
+.blue .ct{color:#0C447C}
+.green{background:#F2FCE6;border-color:#C0DD97}
+.green .ct{color:#173404}
+.gray{background:#F5F5F4;border-color:#D3D1C7}
+.gray .ct{color:#2C2C2A}
+
+.hint{font-size:12px;text-align:center;margin-top:30px;color:#666; font-style: italic;}
+</style>
+</head>
+<body>
+
+<div class="w">
+<div class="header">
+    <h1>🚀 CareerPilot 2026</h1>
+    <p>Autonomous Multi-Agent Application Framework</p>
+</div>
+
+<div class="ll">1. The Control Plane & Memory <span class="badge bn">Core Infrastructure</span></div>
+<div class="row">
+  <div class="card blue" onclick="this.classList.toggle('open')">
+    <p class="ct">Workflow Orchestrator</p>
+    <p class="cs">LangGraph State Machine · Task routing · Failure recovery</p>
+    <div class="ex"><ul>
+      <li>Manages the transition of job states (Discovered → Tailored → Submitted).</li>
+      <li>Handles retries if an agent fails a sub-task.</li>
+      <li>Replaces linear waterfall with a directed cyclic graph (DCG).</li>
+    </ul></div>
+  </div>
+  <div class="card purple" onclick="this.classList.toggle('open')">
+    <p class="ct">Agent 0: Intake & Vault <span class="badge bs">Security</span></p>
+    <p class="cs">Base Resume Parser · HashiCorp Secrets · Interview History</p>
+    <div class="ex"><ul>
+      <li>Parses master NJIT/Antra experiences into structured JSON.</li>
+      <li>Securely injects H1B status and EEO answers only at form-fill time.</li>
+      <li>Stores dynamically rotated session cookies for LinkedIn/Workday.</li>
+    </ul></div>
+  </div>
+  <div class="card gray" onclick="this.classList.toggle('open')">
+    <p class="ct">Data & Observability</p>
+    <p class="cs">PostgreSQL · Vector DB · LangSmith Tracing</p>
+    <div class="ex"><ul>
+      <li>PostgreSQL unique constraint prevents redundant applications.</li>
+      <li>Logs token spend and traces every LangGraph node execution.</li>
+      <li>Archives customized PDF resumes in Object Storage (S3).</li>
+    </ul></div>
+  </div>
+</div>
+
+<div class="ll">2. The Agent Pipeline <span class="badge bn">Execution Layer</span></div>
+<div class="row">
+  <div class="card teal" onclick="this.classList.toggle('open')">
+    <p class="ct">Phase 1: Scout & Intel <span class="badge bf">H1B Filter</span></p>
+    <p class="cs">Event-driven triggers · Playwright DOM watch · USCIS validation</p>
+    <div class="ex"><ul>
+      <li>Triggered instantly by webhooks/RSS (no manual polling).</li>
+      <li>Agent 1 extracts JD schema via GPT-4o-mini.</li>
+      <li>Agent 2 immediately pings USCIS Torch API for LCA filings in Herndon, VA. Drops if probability &lt; 0.7.</li>
+    </ul></div>
+  </div>
+  <div class="card amber" onclick="this.classList.toggle('open')">
+    <p class="ct">Phase 2: Resume Architect</p>
+    <p class="cs">Semantic Matching · LaTeX Render · ATS Simulation Loop</p>
+    <div class="ex"><ul>
+      <li>Claude Sonnet rewrites bullets to match JD context.</li>
+      <li>Regex engine strictly bolds only the technical skills requested by the JD.</li>
+      <li>Loops through local Mock-ATS parser up to 3 times to achieve a 90%+ score.</li>
+    </ul></div>
+  </div>
+  <div class="card coral" onclick="this.classList.toggle('open')">
+    <p class="ct">Phase 3: Pilot & Networker</p>
+    <p class="cs">Browserbase Form Emulation · LinkedIn Outreach</p>
+    <div class="ex"><ul>
+      <li>Agent 4 navigates application portals, injecting tailored resume and Vault secrets.</li>
+      <li>Agent 5 searches LinkedIn for technical recruiters linked to the company.</li>
+      <li>Drafts customized connection requests referencing the specific JD and your skills.</li>
+    </ul></div>
+  </div>
+</div>
+
+<div class="ll">3. Cross-Cutting Infrastructure <span class="badge bn">Global Rules</span></div>
+<div class="row">
+  <div class="card green" onclick="this.classList.toggle('open')">
+    <p class="ct">Human Behavior Engine</p>
+    <p class="cs">Stealth layer for Agents 1, 4, and 5 to bypass bot detection.</p>
+    <div class="ex"><ul>
+      <li>Injects Gaussian delays (μ=1.2s σ=0.4s) into execution timing.</li>
+      <li>Simulates reading time before clicking (word_count / 200 WPM).</li>
+      <li>Executes Bezier mouse paths and variable 45–65 WPM typing speeds.</li>
+      <li>Forces activity only during standard East Coast business hours.</li>
+    </ul></div>
+  </div>
+</div>
+
+<p class="hint">Click any card to expand technical implementation details.</p>
+</div>
+
+<script>
+// No extra JS needed for now, handled by inline onclick for simplicity
+</script>
+</body>
+</html>

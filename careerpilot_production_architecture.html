@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>CareerPilot Production Architecture</title>
+<style>
+*{box-sizing:border-box}
+body{background:linear-gradient(135deg,#eef2ff,#fdf2f8);font-family:'Segoe UI',system-ui;padding:30px;color:#1f2937}
+.container{max-width:1100px;margin:auto}
+.header{text-align:center;background:white;border-radius:16px;padding:30px;margin-bottom:40px;box-shadow:0 10px 30px rgba(0,0,0,0.08)}
+.header h1{margin:0;font-size:34px;color:#4f46e5}
+.header p{color:#6b7280;font-size:18px}
+
+.tier{margin-top:50px}
+.tier h2{font-size:16px;letter-spacing:.15em;text-transform:uppercase;color:#374151;margin-bottom:15px;border-bottom:3px solid #e5e7eb;padding-bottom:6px}
+
+.row{display:flex;gap:16px;flex-wrap:wrap}
+
+.card{flex:1;min-width:300px;background:white;border-radius:14px;padding:18px 20px;box-shadow:0 6px 14px rgba(0,0,0,0.08);transition:all .25s ease;cursor:pointer;border-left:6px solid transparent}
+.card:hover{transform:translateY(-4px);box-shadow:0 16px 30px rgba(0,0,0,0.12)}
+
+.title{font-weight:700;font-size:17px;margin-bottom:6px}
+.desc{font-size:14px;color:#4b5563}
+.extra{display:none;margin-top:12px;border-top:1px solid #eee;padding-top:10px;font-size:13px;color:#374151}
+.card.open .extra{display:block}
+
+.control{border-left-color:#6366f1}
+.discovery{border-left-color:#06b6d4}
+.filter{border-left-color:#f59e0b}
+.resume{border-left-color:#10b981}
+.apply{border-left-color:#ef4444}
+.data{border-left-color:#8b5cf6}
+
+.badge{font-size:10px;font-weight:700;padding:4px 8px;border-radius:20px;margin-left:6px}
+.core{background:#6366f1;color:white}
+.pipeline{background:#10b981;color:white}
+infra{background:#6b7280;color:white}
+
+.footer{text-align:center;margin-top:50px;color:#6b7280;font-size:13px}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<div class="header">
+<h1>CareerPilot — Production Architecture</h1>
+<p>Practical AI‑Driven Job Application Automation System</p>
+</div>
+
+<div class="tier">
+<h2>Tier 1 — Control Plane</h2>
+<div class="row">
+
+<div class="card control" onclick="this.classList.toggle('open')">
+<div class="title">Workflow Orchestrator <span class="badge core">Core</span></div>
+<div class="desc">Central engine coordinating agents and managing application lifecycle.</div>
+<div class="extra">
+<ul>
+<li>LangGraph or Temporal workflow engine</li>
+<li>Tracks Job ID states</li>
+<li>Handles retries and pipeline branching</li>
+<li>Controls daily application limits</li>
+</ul>
+</div>
+</div>
+
+<div class="card control" onclick="this.classList.toggle('open')">
+<div class="title">Profile Vault</div>
+<div class="desc">Secure storage for master resume, work history and personal information.</div>
+<div class="extra">
+<ul>
+<li>Structured JSON experience database</li>
+<li>Reusable EEO responses</li>
+<li>Credential encryption</li>
+<li>Resume base templates</li>
+</ul>
+</div>
+</div>
+
+<div class="card control" onclick="this.classList.toggle('open')">
+<div class="title">Observability</div>
+<div class="desc">Monitoring system performance, cost, and application success rate.</div>
+<div class="extra">
+<ul>
+<li>Token spend tracking</li>
+<li>Application conversion analytics</li>
+<li>Error logging and tracing</li>
+<li>Daily cost guardrails</li>
+</ul>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="tier">
+<h2>Tier 2 — Job Discovery Pipeline</h2>
+<div class="row">
+
+<div class="card discovery" onclick="this.classList.toggle('open')">
+<div class="title">Job Scraper Network <span class="badge pipeline">Pipeline</span></div>
+<div class="desc">Scheduled collectors gather job listings from multiple job boards.</div>
+<div class="extra">
+<ul>
+<li>LinkedIn scraping</li>
+<li>Greenhouse / Lever APIs</li>
+<li>Indeed crawler</li>
+<li>Runs every 10–20 minutes</li>
+</ul>
+</div>
+</div>
+
+<div class="card discovery" onclick="this.classList.toggle('open')">
+<div class="title">Job Normalizer</div>
+<div class="desc">Transforms raw job descriptions into structured schema.</div>
+<div class="extra">
+<ul>
+<li>Extract skills and tech stack</li>
+<li>Detect role seniority</li>
+<li>Location parsing</li>
+<li>Salary extraction</li>
+</ul>
+</div>
+</div>
+
+<div class="card discovery" onclick="this.classList.toggle('open')">
+<div class="title">Duplicate Detector</div>
+<div class="desc">Prevents applying to the same job across different platforms.</div>
+<div class="extra">
+<ul>
+<li>Company + title hash</li>
+<li>URL similarity detection</li>
+<li>Job board cross‑reference</li>
+</ul>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="tier">
+<h2>Tier 3 — Intelligent Filtering</h2>
+<div class="row">
+
+<div class="card filter" onclick="this.classList.toggle('open')">
+<div class="title">Visa Feasibility Scorer</div>
+<div class="desc">Estimates sponsorship probability using historical datasets.</div>
+<div class="extra">
+<ul>
+<li>LCA dataset analysis</li>
+<li>Employer sponsorship history</li>
+<li>Probability scoring model</li>
+</ul>
+</div>
+</div>
+
+<div class="card filter" onclick="this.classList.toggle('open')">
+<div class="title">Job Ranking Engine</div>
+<div class="desc">Scores opportunities based on match quality.</div>
+<div class="extra">
+<ul>
+<li>Skill similarity</li>
+<li>Salary weighting</li>
+<li>Commute distance</li>
+<li>Visa likelihood</li>
+</ul>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="tier">
+<h2>Tier 4 — Resume Intelligence</h2>
+<div class="row">
+
+<div class="card resume" onclick="this.classList.toggle('open')">
+<div class="title">Resume Tailoring Engine</div>
+<div class="desc">Generates job‑specific resume versions from master experience data.</div>
+<div class="extra">
+<ul>
+<li>Semantic bullet retrieval</li>
+<li>Keyword alignment</li>
+<li>Template‑based PDF rendering</li>
+<li>Maximum 2 rewrite iterations</li>
+</ul>
+</div>
+</div>
+
+<div class="card resume" onclick="this.classList.toggle('open')">
+<div class="title">Human Review Gate</div>
+<div class="desc">Approval checkpoint before submitting applications.</div>
+<div class="extra">
+<ul>
+<li>Dashboard review interface</li>
+<li>Edit resume before submission</li>
+<li>Approve / Reject pipeline step</li>
+</ul>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="tier">
+<h2>Tier 5 — Application Automation</h2>
+<div class="row">
+
+<div class="card apply" onclick="this.classList.toggle('open')">
+<div class="title">Application Bot</div>
+<div class="desc">Automates form submission on supported ATS platforms.</div>
+<div class="extra">
+<ul>
+<li>Playwright automation</li>
+<li>Site‑specific adapters</li>
+<li>Human‑like typing delays</li>
+<li>Error recovery</li>
+</ul>
+</div>
+</div>
+
+<div class="card apply" onclick="this.classList.toggle('open')">
+<div class="title">Networking Assistant</div>
+<div class="desc">Suggests outreach messages to recruiters and hiring managers.</div>
+<div class="extra">
+<ul>
+<li>LinkedIn profile discovery</li>
+<li>AI‑generated intro messages</li>
+<li>Human sends connection request</li>
+</ul>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="tier">
+<h2>Tier 6 — Data Infrastructure</h2>
+<div class="row">
+
+<div class="card data" onclick="this.classList.toggle('open')">
+<div class="title">Application Database <span class="badge infra">Infra</span></div>
+<div class="desc">Persistent storage for job pipeline and application results.</div>
+<div class="extra">
+<ul>
+<li>PostgreSQL state database</li>
+<li>Application history</li>
+<li>Interview tracking</li>
+</ul>
+</div>
+</div>
+
+<div class="card data" onclick="this.classList.toggle('open')">
+<div class="title">Vector Knowledge Store</div>
+<div class="desc">Semantic memory for resume bullets and interview answers.</div>
+<div class="extra">
+<ul>
+<li>Embedding search</li>
+<li>Experience retrieval</li>
+<li>Question‑answer archive</li>
+</ul>
+</div>
+</div>
+
+<div class="card data" onclick="this.classList.toggle('open')">
+<div class="title">Document Storage</div>
+<div class="desc">Archive for generated resumes and application artifacts.</div>
+<div class="extra">
+<ul>
+<li>S3 object storage</li>
+<li>Versioned resume PDFs</li>
+<li>Application attachments</li>
+</ul>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="footer">
+Click any card to reveal implementation details.
+</div>
+
+</div>
+
+<script>
+document.querySelectorAll('.card').forEach(c=>{
+ c.addEventListener('click',()=>{
+  c.classList.toggle('open')
+ })
+})
+</script>
+
+</body>
+</html>

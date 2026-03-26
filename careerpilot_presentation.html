@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CareerPilot 2026 — Architecture Walkthrough</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#07090f;
+  --surface:#0e1118;
+  --surface2:#151a24;
+  --border:#1e2535;
+  --teal:#00d4aa;
+  --teal-dim:#00897a;
+  --purple:#8b7cf8;
+  --amber:#f5a623;
+  --coral:#f06e50;
+  --pink:#e87bb4;
+  --blue:#5ba3f5;
+  --green:#5dba6a;
+  --text:#e8eaf0;
+  --muted:#6b7280;
+  --mono:'Space Mono', monospace;
+  --sans:'DM Sans', sans-serif;
+}
+
+body{background:var(--bg);color:var(--text);font-family:var(--sans);height:100vh;overflow:hidden;user-select:none}
+
+/* PROGRESS BAR */
+#progress-bar{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--teal),var(--purple));transition:width .4s ease;z-index:100}
+
+/* HEADER */
+#header{position:fixed;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:16px 28px;z-index:50;background:linear-gradient(to bottom,rgba(7,9,15,.95),transparent)}
+#slide-counter{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.1em}
+#title-pill{font-family:var(--mono);font-size:10px;color:var(--teal);background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.2);padding:4px 12px;border-radius:20px;letter-spacing:.08em}
+#autoplay-btn{font-family:var(--mono);font-size:10px;color:var(--muted);background:rgba(255,255,255,.04);border:1px solid var(--border);padding:5px 12px;border-radius:6px;cursor:pointer;letter-spacing:.06em;transition:all .2s}
+#autoplay-btn:hover{color:var(--text);border-color:var(--teal)}
+#autoplay-btn.playing{color:var(--teal);border-color:var(--teal);background:rgba(0,212,170,.08)}
+
+/* FOOTER NAV */
+#footer{position:fixed;bottom:0;left:0;right:0;display:flex;align-items:center;justify-content:center;gap:16px;padding:20px 28px;background:linear-gradient(to top,rgba(7,9,15,.95),transparent);z-index:50}
+.nav-btn{background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--muted);padding:9px 24px;border-radius:8px;cursor:pointer;font-family:var(--sans);font-size:13px;font-weight:500;transition:all .2s;letter-spacing:.02em}
+.nav-btn:hover:not(:disabled){background:rgba(255,255,255,.1);color:var(--text);border-color:rgba(255,255,255,.2)}
+.nav-btn:disabled{opacity:.25;cursor:not-allowed}
+.dot-row{display:flex;gap:6px;align-items:center}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--border);transition:all .3s;cursor:pointer}
+.dot.on{background:var(--teal);width:18px;border-radius:3px}
+
+/* SLIDES CONTAINER */
+#slides{position:fixed;inset:0;overflow:hidden}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 40px 80px;opacity:0;transform:translateX(60px);transition:opacity .5s ease,transform .5s ease;pointer-events:none}
+.slide.active{opacity:1;transform:translateX(0);pointer-events:all}
+.slide.exit{opacity:0;transform:translateX(-60px)}
+
+/* NARRATION BOX */
+.narration{position:fixed;bottom:70px;left:50%;transform:translateX(-50%);max-width:720px;width:calc(100% - 80px);background:rgba(14,17,24,.92);border:1px solid var(--border);border-radius:10px;padding:12px 18px;font-size:13px;line-height:1.65;color:#b0b8cc;font-family:var(--sans);z-index:40;backdrop-filter:blur(8px)}
+.narration strong{color:var(--text)}
+
+/* SLIDE TITLE */
+.slide-tag{font-family:var(--mono);font-size:10px;letter-spacing:.15em;color:var(--teal);text-transform:uppercase;margin-bottom:10px;opacity:.8}
+.slide-title{font-size:clamp(22px,4vw,38px);font-weight:600;color:var(--text);text-align:center;line-height:1.2;margin-bottom:8px}
+.slide-sub{font-size:14px;color:var(--muted);text-align:center;max-width:600px;line-height:1.6;margin-bottom:28px}
+
+/* GRID NODES */
+.node-grid{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-width:900px;width:100%}
+.node{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;flex:1;min-width:160px;max-width:210px;position:relative;animation:fadeUp .5s ease both}
+.node-label{font-size:11px;font-weight:600;color:var(--text);margin-bottom:3px;line-height:1.3}
+.node-sub{font-size:10px;color:var(--muted);line-height:1.5}
+.node-dot{width:8px;height:8px;border-radius:50%;position:absolute;top:10px;right:10px}
+.node.teal{border-color:rgba(0,212,170,.3);background:rgba(0,212,170,.05)}
+.node.teal .node-dot{background:var(--teal)}
+.node.purple{border-color:rgba(139,124,248,.3);background:rgba(139,124,248,.05)}
+.node.purple .node-dot{background:var(--purple)}
+.node.amber{border-color:rgba(245,166,35,.3);background:rgba(245,166,35,.05)}
+.node.amber .node-dot{background:var(--amber)}
+.node.coral{border-color:rgba(240,110,80,.3);background:rgba(240,110,80,.05)}
+.node.coral .node-dot{background:var(--coral)}
+.node.blue{border-color:rgba(91,163,245,.3);background:rgba(91,163,245,.05)}
+.node.blue .node-dot{background:var(--blue)}
+.node.green{border-color:rgba(93,186,106,.3);background:rgba(93,186,106,.05)}
+.node.green .node-dot{background:var(--green)}
+.node.pink{border-color:rgba(232,123,180,.3);background:rgba(232,123,180,.05)}
+.node.pink .node-dot{background:var(--pink)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+/* FLOW DIAGRAM */
+.flow{display:flex;flex-direction:column;align-items:center;gap:0;width:100%;max-width:700px}
+.flow-box{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 20px;width:100%;text-align:center;animation:fadeUp .4s ease both}
+.flow-box .fb-title{font-size:13px;font-weight:600;color:var(--text)}
+.flow-box .fb-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.flow-arrow{color:var(--muted);font-size:18px;line-height:1;margin:3px 0;opacity:.5}
+.flow-row{display:flex;gap:10px;width:100%;animation:fadeUp .4s ease both}
+.flow-row .flow-box{flex:1}
+.flow-conn{display:flex;align-items:center;color:var(--muted);font-size:14px;opacity:.5;padding:0 4px}
+
+/* BUDGET TABLE */
+.budget-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;max-width:700px;width:100%}
+.budget-item{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;animation:fadeUp .4s ease both}
+.bi-dot{width:8px;min-width:8px;height:8px;border-radius:50%}
+.bi-name{font-size:12px;color:var(--text);flex:1}
+.bi-cost{font-size:13px;font-weight:700;color:var(--teal);font-family:var(--mono)}
+.bi-tag{font-size:9px;padding:2px 6px;border-radius:4px;font-weight:700}
+.tag-free{background:rgba(93,186,106,.15);color:var(--green)}
+.tag-var{background:rgba(245,166,35,.15);color:var(--amber)}
+.tag-fix{background:rgba(91,163,245,.15);color:var(--blue)}
+.total-chip{background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.3);border-radius:8px;padding:10px 20px;font-family:var(--mono);font-size:15px;font-weight:700;color:var(--teal);text-align:center;margin-top:6px;animation:fadeUp .5s .3s ease both}
+
+/* TITLE SLIDE */
+.hero-logo{width:64px;height:64px;background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.3);border-radius:16px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;animation:fadeUp .5s ease both}
+.hero-title{font-size:clamp(30px,6vw,56px);font-weight:600;color:var(--text);text-align:center;line-height:1.1;animation:fadeUp .5s .1s ease both}
+.hero-accent{color:var(--teal)}
+.hero-sub{font-size:16px;color:var(--muted);margin-top:12px;text-align:center;max-width:520px;animation:fadeUp .5s .2s ease both}
+.hero-chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:20px;animation:fadeUp .5s .3s ease both}
+.chip{font-family:var(--mono);font-size:10px;padding:5px 12px;border-radius:20px;border:1px solid var(--border);color:var(--muted);letter-spacing:.05em}
+.chip.hi{border-color:rgba(0,212,170,.3);color:var(--teal);background:rgba(0,212,170,.06)}
+
+/* TIMELINE */
+.timeline{display:flex;flex-direction:column;gap:6px;max-width:700px;width:100%}
+.tl-row{display:flex;gap:12px;align-items:flex-start;animation:fadeUp .4s ease both}
+.tl-week{font-family:var(--mono);font-size:10px;color:var(--muted);min-width:80px;padding-top:12px;letter-spacing:.05em}
+.tl-bar{flex:1;border-radius:8px;padding:10px 14px}
+.tl-bar .tb-title{font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px}
+.tl-bar .tb-body{font-size:11px;color:var(--muted);line-height:1.5}
+.w12{background:rgba(0,212,170,.07);border:1px solid rgba(0,212,170,.2)}
+.w34{background:rgba(91,163,245,.07);border:1px solid rgba(91,163,245,.2)}
+.w56{background:rgba(139,124,248,.07);border:1px solid rgba(139,124,248,.2)}
+.w78{background:rgba(245,166,35,.07);border:1px solid rgba(245,166,35,.2)}
+.w910{background:rgba(240,110,80,.07);border:1px solid rgba(240,110,80,.2)}
+.w1112{background:rgba(232,123,180,.07);border:1px solid rgba(232,123,180,.2)}
+
+/* VERDICT */
+.verdict-box{border-radius:10px;padding:14px 18px;max-width:680px;width:100%;animation:fadeUp .4s ease both}
+.verdict-red{background:rgba(220,50,50,.07);border:1px solid rgba(220,50,50,.25)}
+.verdict-green{background:rgba(93,186,106,.07);border:1px solid rgba(93,186,106,.25)}
+.verdict-title{font-size:14px;font-weight:600;margin-bottom:5px}
+.verdict-red .verdict-title{color:#f87171}
+.verdict-green .verdict-title{color:var(--green)}
+.verdict-body{font-size:12px;line-height:1.65;color:var(--muted)}
+
+/* STAT ROW */
+.stat-row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-bottom:16px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 20px;text-align:center;min-width:130px;animation:fadeUp .4s ease both}
+.stat-val{font-size:26px;font-weight:700;color:var(--teal);font-family:var(--mono);line-height:1}
+.stat-label{font-size:11px;color:var(--muted);margin-top:4px}
+
+/* SCAN LINES (aesthetic) */
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.03) 2px,rgba(0,0,0,.03) 4px);pointer-events:none;z-index:1000}
+
+/* KEYBOARD HINT */
+#kb-hint{position:fixed;bottom:18px;right:24px;font-family:var(--mono);font-size:9px;color:rgba(107,114,128,.4);letter-spacing:.06em}
+</style>
+</head>
+<body>
+
+<div id="progress-bar" style="width:0%"></div>
+
+<div id="header">
+  <span id="slide-counter">01 / 13</span>
+  <span id="title-pill">CAREERPILOT 2026</span>
+  <button id="autoplay-btn" onclick="toggleAutoplay()">▶ AUTO-PLAY</button>
+</div>
+
+<div id="slides">
+
+<!-- SLIDE 1: TITLE -->
+<div class="slide active" id="s1">
+  <div class="hero-logo">
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+      <path d="M16 4L28 10V22L16 28L4 22V10L16 4Z" stroke="#00d4aa" stroke-width="1.5" fill="rgba(0,212,170,.1)"/>
+      <circle cx="16" cy="16" r="4" fill="#00d4aa" opacity=".8"/>
+      <path d="M16 4V12M16 20V28M4 10L11 14M21 18L28 22" stroke="#00d4aa" stroke-width="1" opacity=".4"/>
+    </svg>
+  </div>
+  <h1 class="hero-title">CareerPilot <span class="hero-accent">2026</span></h1>
+  <p class="hero-sub">A stateful multi-agent job application system that finds, tailors, submits, and follows up on applications — automatically and undetectably.</p>
+  <div class="hero-chips">
+    <span class="chip hi">7 Agents</span>
+    <span class="chip hi">9 Layers</span>
+    <span class="chip hi">~$25/month</span>
+    <span class="chip hi">8–12 weeks to build</span>
+    <span class="chip">LangGraph</span>
+    <span class="chip">Claude Sonnet</span>
+    <span class="chip">Playwright</span>
+    <span class="chip">PostgreSQL</span>
+    <span class="chip">Pinecone</span>
+  </div>
+  <div class="narration"><strong>Welcome.</strong> This walkthrough covers the complete CareerPilot 2026 architecture — a fully automated job application pipeline built on multi-agent AI. Use the arrow keys or buttons below to advance. Press Auto-Play to run it hands-free.</div>
+</div>
+
+<!-- SLIDE 2: THE PROBLEM -->
+<div class="slide" id="s2">
+  <div class="slide-tag">The Problem</div>
+  <h2 class="slide-title">Why manual job applications don't scale</h2>
+  <p class="slide-sub">Each application takes 2–3 hours when done properly. CareerPilot brings that to under 5 minutes.</p>
+  <div class="stat-row">
+    <div class="stat" style="animation-delay:.0s"><div class="stat-val">2–3h</div><div class="stat-label">per application (manual)</div></div>
+    <div class="stat" style="animation-delay:.1s"><div class="stat-val">&lt;5m</div><div class="stat-label">per application (CareerPilot)</div></div>
+    <div class="stat" style="animation-delay:.2s"><div class="stat-val">~40%</div><div class="stat-label">jobs require H1B check first</div></div>
+    <div class="stat" style="animation-delay:.3s"><div class="stat-val">90%</div><div class="stat-label">applications never read by human</div></div>
+  </div>
+  <div class="node-grid" style="margin-top:8px">
+    <div class="node coral" style="animation-delay:.1s"><div class="node-dot"></div><div class="node-label">Manual resume tailoring</div><div class="node-sub">Rewriting for each JD takes 45–60 min</div></div>
+    <div class="node coral" style="animation-delay:.2s"><div class="node-dot"></div><div class="node-label">H1B sponsor research</div><div class="node-sub">Checking LCA data takes 20 min per company</div></div>
+    <div class="node coral" style="animation-delay:.3s"><div class="node-dot"></div><div class="node-label">ATS keyword matching</div><div class="node-sub">Getting through screeners requires exact terms</div></div>
+    <div class="node coral" style="animation-delay:.4s"><div class="node-dot"></div><div class="node-label">Recruiter outreach</div><div class="node-sub">Finding &amp; drafting DMs takes 30 min each</div></div>
+  </div>
+  <div class="narration">The average well-tailored application takes <strong>2–3 hours</strong> — resume customisation, H1B research, ATS optimization, and recruiter outreach. CareerPilot automates every one of these steps, reducing that to under 5 minutes of your time.</div>
+</div>
+
+<!-- SLIDE 3: SYSTEM OVERVIEW -->
+<div class="slide" id="s3">
+  <div class="slide-tag">System Overview</div>
+  <h2 class="slide-title">9 layers, 7 agents, one pipeline</h2>
+  <div class="flow" style="max-width:600px">
+    <div class="flow-box teal" style="animation-delay:.05s"><div class="fb-title" style="color:#00d4aa">Event trigger layer</div><div class="fb-sub">Push-based — fires within seconds of a new job posting</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-box" style="animation-delay:.1s;border-color:rgba(139,124,248,.3);background:rgba(139,124,248,.05)"><div class="fb-title" style="color:#8b7cf8">Agent 0 — Intake &amp; security</div><div class="fb-sub">One-time setup: resume parsing, vault, browser profiles</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-row" style="animation-delay:.15s">
+      <div class="flow-box blue"><div class="fb-title" style="color:#5ba3f5">Phase 1 — Discovery</div><div class="fb-sub">Agents 1 &amp; 2: Scout + H1B gate</div></div>
+      <div class="flow-conn">→</div>
+      <div class="flow-box green"><div class="fb-title" style="color:#5dba6a">Phase 2 — Generation</div><div class="fb-sub">Agent 3: Resume + cover letter</div></div>
+    </div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-box amber" style="animation-delay:.2s;border-color:rgba(245,166,35,.3);background:rgba(245,166,35,.05)"><div class="fb-title" style="color:#f5a623">Human behavior engine</div><div class="fb-sub">Cross-cutting: injected into Agents 1, 4, 5</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-row" style="animation-delay:.25s">
+      <div class="flow-box coral"><div class="fb-title" style="color:#f06e50">Phase 3 — Submission</div><div class="fb-sub">Agents 4 &amp; 5: Apply + DM</div></div>
+      <div class="flow-conn">→</div>
+      <div class="flow-box pink"><div class="fb-title" style="color:#e87bb4">Phase 4 — Follow-up</div><div class="fb-sub">Agents 6 &amp; 7: Follow-up + Prep</div></div>
+    </div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-box" style="animation-delay:.3s"><div class="fb-title">Data + Orchestration + Observability</div><div class="fb-sub">LangGraph · Redis · PostgreSQL · Pinecone · LangSmith</div></div>
+  </div>
+  <div class="narration">The system runs top-to-bottom. A job posting arrives, passes through intelligence checks, gets a custom resume generated, then an AI agent submits the application and a separate agent contacts the recruiter — all without you touching anything.</div>
+</div>
+
+<!-- SLIDE 4: EVENT TRIGGER LAYER -->
+<div class="slide" id="s4">
+  <div class="slide-tag">Layer 1 — Event Triggers</div>
+  <h2 class="slide-title">Zero polling. Push-only. Fires in seconds.</h2>
+  <p class="slide-sub">The old design checked job boards every 15 minutes. This runs the moment a job is posted.</p>
+  <div class="node-grid">
+    <div class="node teal" style="animation-delay:.0s"><div class="node-dot"></div><div class="node-label">Gmail Pub/Sub webhook</div><div class="node-sub">LinkedIn + Indeed email alerts → dedicated inbox → Google Pub/Sub push → triggers pipeline in &lt;10s</div></div>
+    <div class="node teal" style="animation-delay:.1s"><div class="node-dot"></div><div class="node-label">WebSub / RSS feeds</div><div class="node-sub">Superfeedr aggregator monitors Greenhouse, Lever, RemoteOK — pushes notification on new item</div></div>
+    <div class="node teal" style="animation-delay:.2s"><div class="node-dot"></div><div class="node-label">Career page watcher</div><div class="node-sub">Playwright stores DOM hash of /jobs pages — fires only on change, not on schedule</div></div>
+    <div class="node teal" style="animation-delay:.3s"><div class="node-dot"></div><div class="node-label">Vector dedup gate</div><div class="node-sub">Embeds incoming JD → cosine similarity check → drops reposts (similarity &gt; 0.92) before processing</div></div>
+  </div>
+  <div style="margin-top:14px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+    <div style="background:rgba(0,212,170,.06);border:1px solid rgba(0,212,170,.2);border-radius:8px;padding:8px 16px;font-size:11px;color:#00d4aa;font-family:var(--mono)">Old: poll every 15 mins = max 15-min delay</div>
+    <div style="background:rgba(93,186,106,.08);border:1px solid rgba(93,186,106,.3);border-radius:8px;padding:8px 16px;font-size:11px;color:var(--green);font-family:var(--mono)">New: push-triggered = &lt;10 second delay</div>
+  </div>
+  <div class="narration">Instead of polling job boards on a timer, we hook into the notification systems they already provide. LinkedIn and Indeed send job alert emails — Gmail Pub/Sub fires a webhook the instant that email arrives. You get notified of new jobs before most people even refresh the page.</div>
+</div>
+
+<!-- SLIDE 5: SECURITY + AGENT 0 -->
+<div class="slide" id="s5">
+  <div class="slide-tag">Layer 2 — Security Baseline + Agent 0</div>
+  <h2 class="slide-title">Always-on security. One-time setup.</h2>
+  <div class="node-grid">
+    <div class="node" style="animation-delay:.0s;border-color:rgba(107,114,128,.3);background:rgba(107,114,128,.05)"><div class="node-dot" style="background:#888"></div><div class="node-label">HashiCorp Vault</div><div class="node-sub">Dynamic short-lived tokens per agent. API keys, cookies, EEO answers. Never in env vars or DB plaintext.</div></div>
+    <div class="node" style="animation-delay:.1s;border-color:rgba(107,114,128,.3);background:rgba(107,114,128,.05)"><div class="node-dot" style="background:#888"></div><div class="node-label">GDPR + audit log</div><div class="node-sub">Immutable append-only audit trail. 12-month TTL on job records. EEO data isolated, never in LLM context.</div></div>
+    <div class="node purple" style="animation-delay:.2s"><div class="node-dot"></div><div class="node-label">Resume ingestion</div><div class="node-sub">Claude Sonnet parses your PDF → PostgreSQL roles/bullets/skills tables. Versioned. Re-run on any update.</div></div>
+    <div class="node purple" style="animation-delay:.3s"><div class="node-dot"></div><div class="node-label">Truthfulness gate</div><div class="node-sub">truth_constraints table stores your real companies/dates. Agent 3 cannot invent experience that isn't here.</div></div>
+    <div class="node purple" style="animation-delay:.4s"><div class="node-dot"></div><div class="node-label">Browser profile factory</div><div class="node-sub">Creates aged profiles with 6 months of history. 2-week warm-up before first real application. Defeats fingerprinting.</div></div>
+    <div class="node purple" style="animation-delay:.5s"><div class="node-dot"></div><div class="node-label">Market intelligence</div><div class="node-sub">Levels.fyi + Glassdoor salary data loaded. Auto-populates salary fields at P60. Never leaves required fields blank.</div></div>
+  </div>
+  <div class="narration">The truthfulness gate is critical — without it, Claude could hallucinate experience you don't have, which is resume fraud. The <strong>truth_constraints table</strong> acts as a hard boundary: every generated bullet point is cross-checked against your real work history before it goes anywhere.</div>
+</div>
+
+<!-- SLIDE 6: PHASE 1 - DISCOVERY -->
+<div class="slide" id="s6">
+  <div class="slide-tag">Phase 1 — Discovery &amp; Validation</div>
+  <h2 class="slide-title">Two agents decide if a job is worth your time</h2>
+  <div class="flow" style="max-width:580px">
+    <div class="flow-box blue" style="animation-delay:.0s"><div class="fb-title" style="color:#5ba3f5">Agent 1 · Scout</div><div class="fb-sub">Event-driven Playwright · HTML → canonical JD JSON · GPT-4o-mini extractor · schema version registry</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-box" style="animation-delay:.1s;border-color:rgba(245,166,35,.3);background:rgba(245,166,35,.06)"><div class="fb-title" style="color:#f5a623">ATS platform detector</div><div class="fb-sub">Identifies Workday / Greenhouse / Lever / Taleo / Ashby → routes to correct submission adapter</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-box blue" style="animation-delay:.2s"><div class="fb-title" style="color:#5ba3f5">Agent 2 · Intel</div><div class="fb-sub">DOL OFLC H-1B disclosure data · myvisajobs.com · Crunchbase funding check</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-row" style="animation-delay:.3s;gap:8px">
+      <div class="flow-box" style="border-color:rgba(220,50,50,.3);background:rgba(220,50,50,.06)"><div class="fb-title" style="color:#f87171;font-size:12px">H1B &lt; 0.7 → STOP</div><div class="fb-sub">Logged as low probability. Saves all downstream cost.</div></div>
+      <div class="flow-conn">or</div>
+      <div class="flow-box green" style=""><div class="fb-title" style="color:#5dba6a;font-size:12px">H1B ≥ 0.7 → CONTINUE</div><div class="fb-sub">Passes to Phase 2 for resume generation.</div></div>
+    </div>
+  </div>
+  <div class="narration"><strong>Important realism note:</strong> The original design referenced a "USCIS Torch API" that doesn't exist. The real source is the Department of Labor's OFLC H-1B Disclosure Data — a publicly downloadable quarterly dataset. We load it into PostgreSQL and query it locally — faster and free.</div>
+</div>
+
+<!-- SLIDE 7: PHASE 2 - GENERATION -->
+<div class="slide" id="s7">
+  <div class="slide-tag">Phase 2 — Generation</div>
+  <h2 class="slide-title">Agent 3 builds a tailored application in 60 seconds</h2>
+  <div class="node-grid">
+    <div class="node green" style="animation-delay:.0s"><div class="node-dot"></div><div class="node-label">Semantic bullet retrieval</div><div class="node-sub">JD requirements embedded → Pinecone finds your most relevant experience bullets</div></div>
+    <div class="node green" style="animation-delay:.1s"><div class="node-dot"></div><div class="node-label">Claude Sonnet rewriter</div><div class="node-sub">Rewrites bullets in JD language. Truthfulness gate blocks any fabricated experience.</div></div>
+    <div class="node green" style="animation-delay:.2s"><div class="node-dot"></div><div class="node-label">Jobscan ATS scoring</div><div class="node-sub">Real ATS matching via Jobscan API. Target ≥ 80%. Hard cap: 3 rewrite attempts, then manual review.</div></div>
+    <div class="node green" style="animation-delay:.3s"><div class="node-dot"></div><div class="node-label">LaTeX PDF renderer</div><div class="node-sub">Pixel-perfect PDF via python-texlive. ATS-safe formatting. Version ID stored for outcome tracking.</div></div>
+    <div class="node green" style="animation-delay:.4s"><div class="node-dot"></div><div class="node-label">Cover letter branch</div><div class="node-sub">GPT-4o-mini detects if required. Claude Sonnet writes 3-paragraph letter (hook, match, close).</div></div>
+    <div class="node green" style="animation-delay:.5s"><div class="node-dot"></div><div class="node-label">Salary auto-population</div><div class="node-sub">Levels.fyi data used to fill salary fields at P60 — never blank, never unrealistic.</div></div>
+  </div>
+  <div class="narration">The ATS loop is where most systems fail. Instead of a home-built parser, we use the <strong>Jobscan API</strong> — the same tool real recruiters use to check resumes. The 90% target from the original design was unrealistic; 80% on Jobscan is well-calibrated and achievable in 1–2 iterations for most roles.</div>
+</div>
+
+<!-- SLIDE 8: HUMAN BEHAVIOR ENGINE -->
+<div class="slide" id="s8">
+  <div class="slide-tag">Cross-Cutting Service</div>
+  <h2 class="slide-title">The human behavior engine — what actually defeats detection</h2>
+  <p class="slide-sub">Anti-bot systems fingerprint 6+ signals simultaneously. You need to defeat all of them.</p>
+  <div class="node-grid">
+    <div class="node amber" style="animation-delay:.0s"><div class="node-dot"></div><div class="node-label">playwright-stealth + TLS</div><div class="node-sub">Masks webdriver flag, JS APIs, canvas fingerprint, WebGL renderer, AudioContext. TLS/JA3 randomization defeats Cloudflare at network layer.</div></div>
+    <div class="node amber" style="animation-delay:.1s"><div class="node-dot"></div><div class="node-label">Residential proxy (Webshare)</div><div class="node-sub">Sticky session per domain — same residential IP for entire application. Data-center IPs get flagged immediately.</div></div>
+    <div class="node amber" style="animation-delay:.2s"><div class="node-dot"></div><div class="node-label">Gaussian timing engine</div><div class="node-sub">All delays drawn from Gaussian (μ=1.4s, σ=0.5s). Business hours gate: 8am–7pm only. No weekends.</div></div>
+    <div class="node amber" style="animation-delay:.3s"><div class="node-dot"></div><div class="node-label">Bezier mouse + typos</div><div class="node-sub">Mouse curves to target with slight overshoot. Typing at 45–65 WPM. 1-in-40 chance of typo + backspace.</div></div>
+    <div class="node amber" style="animation-delay:.4s"><div class="node-dot"></div><div class="node-label">Aged browser profiles</div><div class="node-sub">6 months of warm-up history per domain. Fresh profiles are the #1 bot signal — never create new ones per run.</div></div>
+    <div class="node amber" style="animation-delay:.5s"><div class="node-dot"></div><div class="node-label">CAPTCHA handler</div><div class="node-sub">2captcha primary (~15s solve). On second failure: pause agent + Slack alert + await manual clearance.</div></div>
+  </div>
+  <div class="narration"><strong>playwright-stealth alone does not defeat Cloudflare.</strong> It patches browser JS APIs but doesn't touch the TLS handshake. The JA3 fingerprint, HTTP/2 frame ordering, and behavioral mouse entropy are what modern bot management systems actually check. You need all 6 layers working together.</div>
+</div>
+
+<!-- SLIDE 9: PHASE 3 - SUBMISSION -->
+<div class="slide" id="s9">
+  <div class="slide-tag">Phase 3 — Submission &amp; Networking</div>
+  <h2 class="slide-title">Agent 4 submits. Agent 5 finds the human.</h2>
+  <div class="flow" style="max-width:640px">
+    <div class="flow-row" style="animation-delay:.0s">
+      <div class="flow-box coral"><div class="fb-title" style="color:#f06e50">Agent 4 · Pilot</div><div class="fb-sub">Skyvern (primary) · Computer Use fallback · ATS-specific adapters · saga checkpoints · idempotency keys</div></div>
+      <div class="flow-conn" style="opacity:1;color:var(--muted)">→</div>
+      <div class="flow-box coral"><div class="fb-title" style="color:#f06e50">Agent 5 · Networker</div><div class="fb-sub">Proxycurl API (legal) · hiring manager classifier · Claude Sonnet DM · 3–6 min reading delay</div></div>
+    </div>
+    <div class="flow-arrow">↓</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;animation:fadeUp .4s .2s ease both">
+      <div style="background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.2);border-radius:8px;padding:10px 14px">
+        <div style="font-size:11px;font-weight:600;color:#f5a623;margin-bottom:4px">Workday adapter</div>
+        <div style="font-size:10px;color:var(--muted)">Custom field mapping for Workday's SPA framework. Saga checkpoint per page — resumes if crashed.</div>
+      </div>
+      <div style="background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.2);border-radius:8px;padding:10px 14px">
+        <div style="font-size:11px;font-weight:600;color:#f5a623;margin-bottom:4px">Greenhouse / Lever / Ashby</div>
+        <div style="font-size:10px;color:var(--muted)">Platform-specific DOM field mappings. ~3× more reliable than generic Computer Use alone.</div>
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:12px;background:rgba(93,186,106,.06);border:1px solid rgba(93,186,106,.2);border-radius:8px;padding:10px 16px;max-width:640px;width:100%;font-size:11px;color:var(--green);animation:fadeUp .4s .3s ease both">
+    <strong>Proxycurl replaces "LinkedIn People Search API"</strong> — which requires enterprise partnership and is unavailable to individuals. Proxycurl is a legitimate paid API at ~$0.01/profile with no ToS risk.
+  </div>
+  <div class="narration">The saga pattern for Agent 4 is non-negotiable. Workday and Greenhouse forms have 4–8 pages. Without checkpointing, a crash on page 6 either double-submits or wastes the entire application. Each page state is saved — restarts pick up exactly where they left off.</div>
+</div>
+
+<!-- SLIDE 10: PHASE 4 - LEARNING -->
+<div class="slide" id="s10">
+  <div class="slide-tag">Phase 4 — Follow-up &amp; Learning</div>
+  <h2 class="slide-title">The system gets smarter with every application</h2>
+  <div class="node-grid">
+    <div class="node pink" style="animation-delay:.0s"><div class="node-dot"></div><div class="node-label">Agent 6 · Follow-up</div><div class="node-sub">5-day DM follow-up using Pinecone context recall. Checks Gmail for interview invite first — cancels follow-up if found. Max 1 per application.</div></div>
+    <div class="node pink" style="animation-delay:.1s"><div class="node-dot"></div><div class="node-label">Agent 7 · Interview prep</div><div class="node-sub">Triggered on interview invite detection. Generates 10 STAR behavioral Qs, 5 technical Qs, company brief. Delivered as PDF + Slack.</div></div>
+    <div class="node pink" style="animation-delay:.2s"><div class="node-dot"></div><div class="node-label">Outcome A/B framework</div><div class="node-sub">PostgreSQL tracks resume_version → interview rate. Chi-square test at N=30 per variant — strategy only changes at p &lt; 0.05.</div></div>
+    <div class="node pink" style="animation-delay:.3s"><div class="node-dot"></div><div class="node-label">Interview invite notifier</div><div class="node-sub">Gmail monitored for invite subject-line patterns. Fires immediate SMS + Slack push so you never miss a response window.</div></div>
+  </div>
+  <div style="margin-top:12px;background:rgba(139,124,248,.06);border:1px solid rgba(139,124,248,.2);border-radius:8px;padding:10px 16px;max-width:700px;width:100%;font-size:11px;color:var(--purple);animation:fadeUp .4s .3s ease both">
+    <strong>Statistical rigor matters.</strong> Switching resume strategies based on 3–4 data points is noise-driven, not signal-driven. The Chi-square gate at N=30 with p &lt; 0.05 ensures changes are based on real signal — not coincidence.
+  </div>
+  <div class="narration">Agent 7 closes the loop that most automation systems miss entirely. When you get an interview, the system auto-generates a personalised prep pack using the exact job description and your own past interview answers stored in Pinecone — delivered before you've even replied to schedule the call.</div>
+</div>
+
+<!-- SLIDE 11: INFRA + ORCHESTRATION -->
+<div class="slide" id="s11">
+  <div class="slide-tag">Layers 8 &amp; 9 — Orchestration + Data</div>
+  <h2 class="slide-title">The nervous system &amp; memory</h2>
+  <div class="node-grid">
+    <div class="node" style="animation-delay:.0s;border-color:rgba(107,114,128,.3);background:rgba(107,114,128,.05)"><div class="node-dot" style="background:#888"></div><div class="node-label">LangGraph + LangSmith</div><div class="node-sub">State machine, conditional edges, exponential backoff + jitter. Full trace per run. Circuit breaker per external API.</div></div>
+    <div class="node" style="animation-delay:.1s;border-color:rgba(107,114,128,.3);background:rgba(107,114,128,.05)"><div class="node-dot" style="background:#888"></div><div class="node-label">Redis Streams event bus</div><div class="node-sub">CloudEvents schema. Consumer groups. Dead-letter queue. Event replay for debugging. Async agent communication.</div></div>
+    <div class="node blue" style="animation-delay:.2s"><div class="node-dot"></div><div class="node-label">Supabase PostgreSQL</div><div class="node-sub">Jobs, experiences, outcomes, audit log, salary benchmarks, truth constraints. Row-level security. 12-month TTL.</div></div>
+    <div class="node blue" style="animation-delay:.3s"><div class="node-dot"></div><div class="node-label">Pinecone vector DB</div><div class="node-sub">Namespaces: interview-memory, jd-archive, cover-letter-bank. Semantic retrieval for resume + dedup.</div></div>
+    <div class="node blue" style="animation-delay:.4s"><div class="node-dot"></div><div class="node-label">Upstash Redis</div><div class="node-sub">Session state cache, rate limiter token buckets, dedup bloom filter. All free-tier at this volume.</div></div>
+    <div class="node blue" style="animation-delay:.5s"><div class="node-dot"></div><div class="node-label">Cloudflare R2 + Vault</div><div class="node-sub">Versioned resume PDFs and browser profiles in R2. Vault self-hosted on VPS for secrets management.</div></div>
+  </div>
+  <div class="narration"><strong>Everything in the data layer runs on free tiers</strong> at a volume of 5–20 applications/day. Supabase free tier handles the PostgreSQL load. Pinecone free tier covers the vector storage. Upstash Redis free tier covers the cache. The only unavoidable paid cost is Claude API tokens and residential proxy bandwidth.</div>
+</div>
+
+<!-- SLIDE 12: BUDGET -->
+<div class="slide" id="s12">
+  <div class="slide-tag">Cost Reality</div>
+  <h2 class="slide-title">~$25/month at 5 applications/day</h2>
+  <div class="stat-row">
+    <div class="stat" style="animation-delay:.0s"><div class="stat-val">$25</div><div class="stat-label">per month (5 apps/day)</div></div>
+    <div class="stat" style="animation-delay:.1s"><div class="stat-val">$0.23</div><div class="stat-label">cost per application</div></div>
+    <div class="stat" style="animation-delay:.2s"><div class="stat-val">$0</div><div class="stat-label">for 8 services (free tier)</div></div>
+    <div class="stat" style="animation-delay:.3s"><div class="stat-val">$13</div><div class="stat-label">if run on own machine</div></div>
+  </div>
+  <div class="budget-grid" style="margin-top:4px">
+    <div class="budget-item" style="animation-delay:.1s"><span class="bi-dot" style="background:#378ADD"></span><span class="bi-name">DigitalOcean VPS 2GB <span class="bi-tag tag-fix">fixed</span></span><span class="bi-cost">$12</span></div>
+    <div class="budget-item" style="animation-delay:.15s"><span class="bi-dot" style="background:#8b7cf8"></span><span class="bi-name">Claude Sonnet API <span class="bi-tag tag-var">variable</span></span><span class="bi-cost">$8</span></div>
+    <div class="budget-item" style="animation-delay:.2s"><span class="bi-dot" style="background:#f5a623"></span><span class="bi-name">Webshare residential proxy <span class="bi-tag tag-var">variable</span></span><span class="bi-cost">$4</span></div>
+    <div class="budget-item" style="animation-delay:.25s"><span class="bi-dot" style="background:#00d4aa"></span><span class="bi-name">Proxycurl recruiter lookup <span class="bi-tag tag-var">variable</span></span><span class="bi-cost">$1</span></div>
+    <div class="budget-item" style="animation-delay:.3s"><span class="bi-dot" style="background:#5dba6a"></span><span class="bi-name">Pinecone + Supabase + Redis <span class="bi-tag tag-free">free</span></span><span class="bi-cost">$0</span></div>
+    <div class="budget-item" style="animation-delay:.35s"><span class="bi-dot" style="background:#5dba6a"></span><span class="bi-name">LangSmith + R2 + Vault <span class="bi-tag tag-free">free</span></span><span class="bi-cost">$0</span></div>
+  </div>
+  <div class="total-chip">All-in total: ~$25 / month &nbsp;·&nbsp; Scales to ~$65/mo at 20 apps/day</div>
+  <div class="narration">The cost structure is almost entirely variable — you pay per application, not per month of infrastructure. Running on your own machine (no VPS) drops the baseline to $13/month. At 5 applications a day you're spending about 23 cents per complete application including resume generation, ATS scoring, submission, and recruiter outreach.</div>
+</div>
+
+<!-- SLIDE 13: BUILD PLAN -->
+<div class="slide" id="s13">
+  <div class="slide-tag">Build Plan</div>
+  <h2 class="slide-title">Honest timeline + what to build first</h2>
+  <div class="verdict-box verdict-red" style="animation-delay:.0s;margin-bottom:10px">
+    <div class="verdict-title">Full system: 8–12 weeks for an experienced Python developer</div>
+    <div class="verdict-body">Browser automation, ATS adapters, stealth engine, and LangGraph orchestration each need a dedicated week. Rushing produces brittle code that fails on first real application.</div>
+  </div>
+  <div class="verdict-box verdict-green" style="animation-delay:.1s;margin-bottom:10px">
+    <div class="verdict-title">2-day MVP: paste a job URL → get tailored resume + H1B check + recruiter DM draft</div>
+    <div class="verdict-body">No browser automation. You click Apply yourself. But 2–3 hours of prep drops to under 5 minutes immediately. This is the right starting point.</div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;max-width:700px;width:100%;animation:fadeUp .4s .2s ease both">
+    <div style="background:rgba(0,212,170,.06);border:1px solid rgba(0,212,170,.2);border-radius:8px;padding:9px 12px"><div style="font-size:10px;font-weight:700;color:#00d4aa;margin-bottom:4px;font-family:var(--mono)">WEEKS 1–4</div><div style="font-size:11px;color:var(--muted)">Foundation + Agents 0, 1, 2. DB schema, LangGraph skeleton, H1B data, resume parser.</div></div>
+    <div style="background:rgba(139,124,248,.06);border:1px solid rgba(139,124,248,.2);border-radius:8px;padding:9px 12px"><div style="font-size:10px;font-weight:700;color:var(--purple);margin-bottom:4px;font-family:var(--mono)">WEEKS 5–8</div><div style="font-size:11px;color:var(--muted)">Agent 3 generation, LaTeX, Jobscan loop, cover letter + human behavior engine.</div></div>
+    <div style="background:rgba(240,110,80,.06);border:1px solid rgba(240,110,80,.2);border-radius:8px;padding:9px 12px"><div style="font-size:10px;font-weight:700;color:var(--coral);margin-bottom:4px;font-family:var(--mono)">WEEKS 9–12</div><div style="font-size:11px;color:var(--muted)">ATS adapters, Skyvern, Agent 5 + Proxycurl, follow-up, interview prep, observability.</div></div>
+  </div>
+  <div class="narration"><strong>Start with the 2-day MVP.</strong> It proves the core value proposition — resume tailoring + H1B check + recruiter DM — without any browser automation risk. Every week after that you layer in one more capability. By week 12 you have the full system. Build incrementally, test on real jobs from day 2.</div>
+</div>
+
+</div><!-- end slides -->
+
+<div id="footer">
+  <button class="nav-btn" id="prev-btn" onclick="go(-1)" disabled>← Prev</button>
+  <div class="dot-row" id="dots"></div>
+  <button class="nav-btn" id="next-btn" onclick="go(1)">Next →</button>
+</div>
+
+<div id="kb-hint">← → ARROW KEYS · SPACE</div>
+
+<script>
+const TOTAL = 13;
+let cur = 1;
+let autoPlay = false;
+let autoTimer = null;
+
+function buildDots(){
+  const c = document.getElementById('dots');
+  for(let i=1;i<=TOTAL;i++){
+    const d = document.createElement('div');
+    d.className='dot'+(i===1?' on':'');
+    d.onclick=(()=>{const n=i;return()=>goTo(n)})();
+    c.appendChild(d);
+  }
+}
+
+function goTo(n){
+  if(n<1||n>TOTAL) return;
+  const prev = document.getElementById('s'+cur);
+  prev.classList.add('exit');
+  setTimeout(()=>prev.classList.remove('exit','active'),500);
+  cur=n;
+  const next = document.getElementById('s'+cur);
+  next.classList.add('active');
+  document.getElementById('slide-counter').textContent = String(cur).padStart(2,'0')+' / '+String(TOTAL).padStart(2,'0');
+  document.getElementById('progress-bar').style.width = ((cur-1)/(TOTAL-1)*100)+'%';
+  document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('on',i===cur-1));
+  document.getElementById('prev-btn').disabled = cur===1;
+  document.getElementById('next-btn').disabled = cur===TOTAL;
+  if(cur===TOTAL && autoPlay) stopAutoplay();
+}
+
+function go(d){ goTo(cur+d); }
+
+function toggleAutoplay(){
+  autoPlay ? stopAutoplay() : startAutoplay();
+}
+function startAutoplay(){
+  autoPlay=true;
+  document.getElementById('autoplay-btn').classList.add('playing');
+  document.getElementById('autoplay-btn').textContent='⏸ PAUSE';
+  autoTimer=setInterval(()=>{
+    if(cur<TOTAL) go(1);
+    else stopAutoplay();
+  },7000);
+}
+function stopAutoplay(){
+  autoPlay=false;
+  clearInterval(autoTimer);
+  document.getElementById('autoplay-btn').classList.remove('playing');
+  document.getElementById('autoplay-btn').textContent='▶ AUTO-PLAY';
+}
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key===' ') go(1);
+  if(e.key==='ArrowLeft') go(-1);
+});
+
+buildDots();
+</script>
+</body>
+</html>

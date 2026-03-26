@@ -1,0 +1,213 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>CareerPilot 2026 | Final System Architecture</title>
+<style>
+*{box-sizing:border-box}
+body{background-color:#F0F2F5; padding: 20px; color: #1A1D21; line-height: 1.5;}
+.w{max-width: 1000px; margin: 0 auto; padding:10px 0 30px; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif}
+.header{text-align: center; margin-bottom: 50px; padding: 20px; background: #fff; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);}
+.header h1{margin: 0; font-size: 32px; font-weight: 800; color: #1A73E8;}
+.header p{margin: 10px 0 0; color: #5F6368; font-size: 18px; font-weight: 500;}
+
+.tier-label{font-size:14px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin:40px 0 15px 5px;color:#444; border-bottom: 2px solid #DADCE0; padding-bottom: 5px;}
+.row{display:flex;gap:15px;margin-bottom:15px; flex-wrap: wrap;}
+
+.card{border-radius:12px;padding:18px 20px;flex:1; min-width: 300px; cursor:pointer;border:2px solid transparent;transition:all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); box-shadow: 0 4px 6px rgba(0,0,0,0.05); background: #fff; position: relative; overflow: hidden;}
+.card:hover{transform: translateY(-4px); box-shadow: 0 12px 20px rgba(0,0,0,0.1); border-color: rgba(0,0,0,0.1);}
+
+.ct{font-size:16px;font-weight:700;margin:0 0 8px;color:#111; display: flex; align-items: center; gap: 8px;}
+.cs{font-size:13px;line-height:1.6;margin:0;color:#4A4A4A; font-weight: 400;}
+
+.ex{display:none;margin-top:15px;padding-top:15px;border-top:1px solid rgba(0,0,0,0.08);font-size:13px;color:#333; animation: fadeIn 0.3s ease-in-out;}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.ex ul{margin:8px 0 0;padding-left:20px}
+.ex li{margin-bottom:8px}
+.card.open .ex{display:block}
+
+.badge{display:inline-block;font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;margin-left:8px;vertical-align:middle; text-transform: uppercase; letter-spacing: 0.05em;}
+.gate-badge{background: #D93025; color: #fff;}
+.setup-badge{background: #188038; color: #fff;}
+.infra-badge{background: #70757A; color: #fff;}
+
+/* Tier Themes */
+.blue-card{border-left: 6px solid #1A73E8;}
+.blue-card .ct{color: #174EA6;}
+.teal-card{border-left: 6px solid #00897B;}
+.teal-card .ct{color: #004D40;}
+.amber-card{border-left: 6px solid #F9AB00;}
+.amber-card .ct{color: #3C2317;}
+.coral-card{border-left: 6px solid #E67C73;}
+.coral-card .ct{color: #7B2222;}
+.green-card{border-left: 6px solid #34A853;}
+.green-card .ct{color: #0D652D;}
+.gray-card{border-left: 6px solid #5F6368;}
+
+.gate{background: #FEF7F7; border: 2px dashed #D93025 !important; flex: 1 1 100% !important; margin: 10px 0;}
+.gate .ct{color: #D93025;}
+
+.hint{font-size:13px;text-align:center;margin-top:40px;color:#70757A; font-weight: 500;}
+</style>
+</head>
+<body>
+
+<div class="w">
+<div class="header">
+    <h1>🚀 CareerPilot 2026 | Final Architecture</h1>
+    <p>Strategic Multi-Agent Automation Pipeline (H1B Transfer Focused)</p>
+</div>
+
+<!-- TIER 1 -->
+<div class="tier-label">Tier 1: The Control Plane (Brains & Memory)</div>
+<div class="row">
+  <div class="card blue-card" onclick="this.classList.toggle('open')">
+    <p class="ct">🧠 LangGraph Orchestrator <span class="badge setup-badge">Core</span></p>
+    <p class="cs">Central state machine managing the application lifecycle. Handles task routing, error retries, and state persistence.</p>
+    <div class="ex">
+      <b>Responsibilities:</b>
+      <ul>
+        <li>Maintains "Ground Truth" for every Job ID (Status: Found, Verified, Tailored, etc.).</li>
+        <li>Cycles through the <b>ATS Simulation Loop</b> until thresholds are met.</li>
+        <li>Manages high-level "Phase" handoffs between agent clusters.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="card blue-card" onclick="this.classList.toggle('open')">
+    <p class="ct">🔐 Vault & Setup (Agent 0)</p>
+    <p class="cs">Secure storage for Master Resume (NJIT/Antra), EEO answers, and rotated session tokens.</p>
+    <div class="ex">
+      <b>Data Points:</b>
+      <ul>
+        <li><b>Experience DB:</b> Structured JSON of all professional history.</li>
+        <li><b>Secrets:</b> LinkedIn cookies, Portal credentials, and USCIS API keys.</li>
+        <li><b>Identity Vault:</b> Pre-defined diversity and disability disclosure answers.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="card blue-card" onclick="this.classList.toggle('open')">
+    <p class="ct">📊 Observability Node</p>
+    <p class="cs">Monitors token budget, performance metrics, and application success rates.</p>
+    <div class="ex">
+      <b>Metrics Tracked:</b>
+      <ul>
+        <li>Daily Token Spend (Guardrail alerts on budget breach).</li>
+        <li>Agent response times and LangSmith traces.</li>
+        <li>Geographic success rate (Concentration on <b>Herndon, VA</b> and surrounding areas).</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- TIER 2 -->
+<div class="tier-label">Tier 2: The Agent Pipeline (Specialized Workers)</div>
+
+<div class="row">
+  <div class="card teal-card" onclick="this.classList.toggle('open')">
+    <p class="ct">🔍 Phase 1: Sourcing Scout</p>
+    <p class="cs">Event-driven discovery via RSS/Webhooks. Extracts Job Descriptions into structured JSON via GPT-4o-mini.</p>
+    <div class="ex">
+      <ul>
+        <li>Triggers on change, not on cron (Zero-polling architecture).</li>
+        <li>Extracts Technical Stack, Role level, and Compensation.</li>
+        <li>Scans for initial visa keywords (Sponsorship, H1B, Transfer).</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- GATE 1 -->
+<div class="row">
+  <div class="card gate" onclick="this.classList.toggle('open')">
+    <p class="ct">⚖️ Gate A: H1B Harsh Truth Gate (Agent 2 - Intel) <span class="badge gate-badge">Decision Point</span></p>
+    <p class="cs">Immediate validation using the USCIS Torch API. Strictly filters for H1B Transfer probability ≥ 0.7.</p>
+    <div class="ex">
+      <b>Validation Rules:</b>
+      <ul>
+        <li>Checks historical LCA filings for the employer in <b>Herndon, VA</b> and Fairfax/Loudoun counties.</li>
+        <li>Verifies employer standing and previous sponsorship volume.</li>
+        <li><b>Go/No-Go:</b> If probability < 0.7, the pipeline halts to save tokens and time.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="card amber-card" onclick="this.classList.toggle('open')">
+    <p class="ct">📝 Phase 2: Resume Architect (Agent 3)</p>
+    <p class="cs">Claude 3.5 Sonnet + LaTeX pipeline. Enforces bolding of technical expertise based on JD requirements.</p>
+    <div class="ex">
+      <b>Advanced Tailoring:</b>
+      <ul>
+        <li>Semantic search retrieves the most relevant Master CV bullets.</li>
+        <li><b>Bolding Engine:</b> Uses dynamic regex to bold technical skills *only* if they appear in the JD.</li>
+        <li><b>ATS Simulation Loop:</b> Recursive re-writes (Max 3) to hit target score ≥ 90%.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- GATE 2 -->
+<div class="row">
+  <div class="card gate" onclick="this.classList.toggle('open')">
+    <p class="ct">🤳 Gate B: Human-on-the-Loop <span class="badge gate-badge">Final Approval</span></p>
+    <p class="cs">Mandatory pause. System sends a Slack/WhatsApp summary for final verification before submission.</p>
+    <div class="ex">
+      <b>Review Package:</b>
+      <ul>
+        <li>Summary of the Job, the company's H1B score, and the final tailored PDF.</li>
+        <li>Options: [✅ Approve & Submit] [✏️ Manual Edit] [❌ Discard].</li>
+        <li>Ensures no "hallucinated" details ever reach a recruiter.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="card coral-card" onclick="this.classList.toggle('open')">
+    <p class="ct">🚀 Phase 3: Pilot & Networker</p>
+    <p class="cs">Final execution layer. Handles the RPA submission and post-apply LinkedIn outreach.</p>
+    <div class="ex">
+      <ul>
+        <li><b>Agent 4 (Pilot):</b> Fills forms via Browserbase/Anthropic "Computer Use".</li>
+        <li><b>Agent 5 (Networker):</b> Identifies hiring stakeholders and sends a 1st-degree personalized connection.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- TIER 3 -->
+<div class="tier-label">Tier 3: Foundation Layer (Infrastructure)</div>
+<div class="row">
+  <div class="card green-card" onclick="this.classList.toggle('open')">
+    <p class="ct">🕵️‍♂️ Human Behavior Engine <span class="badge infra-badge">Stealth</span></p>
+    <p class="cs">Cross-cutting utility used by all browser agents. Bypasses detection via randomized emulation.</p>
+    <div class="ex">
+      <b>Anti-Bot Features:</b>
+      <ul>
+        <li><b>Gaussian Jitter:</b> Natural delays between clicks and keystrokes.</li>
+        <li><b>Bezier Pathing:</b> Human-like mouse movements (No teleports).</li>
+        <li><b>Fingerprint Rotation:</b> Residential proxies and unique UA strings.</li>
+        <li><b>Business Hour Gating:</b> Activity limited to East Coast working hours.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="card gray-card" onclick="this.classList.toggle('open')">
+    <p class="ct">🗄️ Data Layer (Polyglot Memory)</p>
+    <p class="cs">The system's persistent record. Ensures zero duplication and full auditability.</p>
+    <div class="ex">
+      <ul>
+        <li><b>PostgreSQL:</b> Job metadata, Application status, and Version tracking.</li>
+        <li><b>Object Storage (S3):</b> Archives of every specific PDF generated.</li>
+        <li><b>Vector DB:</b> Semantic storage for past interview answers and master bullets.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<p class="hint">Click any card to expand deep-dive implementation details.</p>
+</div>
+
+</body>
+</html>

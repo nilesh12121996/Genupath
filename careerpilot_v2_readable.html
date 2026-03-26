@@ -1,0 +1,330 @@
+
+<style>
+*{box-sizing:border-box}
+.w{padding:6px 0 16px;font-family:var(--font-sans)}
+.ll{font-size:11px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;margin:16px 0 6px 2px;color:var(--color-text-primary)}
+.row{display:flex;gap:8px;margin-bottom:8px}
+.card{border-radius:10px;padding:11px 13px;flex:1;cursor:pointer;border:1.5px solid transparent;transition:border-color .15s}
+.card:hover{border-color:var(--color-border-primary)}
+.ct{font-size:13px;font-weight:500;margin:0 0 4px;color:var(--color-text-primary)}
+.cs{font-size:12px;line-height:1.55;margin:0;color:var(--color-text-primary);opacity:.8}
+.ex{display:none;margin-top:9px;padding-top:8px;border-top:1.5px solid rgba(0,0,0,.1);font-size:12px;color:var(--color-text-primary);line-height:1.6}
+.ex ul{margin:4px 0 0;padding-left:16px}
+.ex li{margin-bottom:4px}
+.card.open .ex{display:block}
+.badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 7px;border-radius:8px;margin-left:5px;vertical-align:middle}
+.bn{background:#0F6E56;color:#fff}
+.bf{background:#854F0B;color:#fff}
+.bs{background:#3C3489;color:#fff}
+.sb{border:1.5px solid rgba(0,0,0,.12);border-radius:12px;padding:10px 10px 5px;margin-bottom:8px}
+.sbl{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin:0 0 8px;color:var(--color-text-primary)}
+.arr{text-align:center;font-size:16px;margin:2px 0;color:var(--color-text-primary)}
+.hint{font-size:11px;text-align:center;margin-top:10px;color:var(--color-text-primary);opacity:.6}
+
+.teal{background:#9FE1CB;border-color:#0F6E56}
+.teal .ct,.teal .cs,.teal .ex{color:#04342C}
+.teal .ex{border-top-color:rgba(4,52,44,.2)}
+
+.purple{background:#AFA9EC;border-color:#3C3489}
+.purple .ct,.purple .cs,.purple .ex{color:#26215C}
+.purple .ex{border-top-color:rgba(38,33,92,.2)}
+
+.coral{background:#F0997B;border-color:#712B13}
+.coral .ct,.coral .cs,.coral .ex{color:#4A1B0C}
+.coral .ex{border-top-color:rgba(74,27,12,.2)}
+
+.amber{background:#FAC775;border-color:#854F0B}
+.amber .ct,.amber .cs,.amber .ex{color:#412402}
+.amber .ex{border-top-color:rgba(65,36,2,.2)}
+
+.blue{background:#85B7EB;border-color:#0C447C}
+.blue .ct,.blue .cs,.blue .ex{color:#042C53}
+.blue .ex{border-top-color:rgba(4,44,83,.2)}
+
+.green{background:#C0DD97;border-color:#3B6D11}
+.green .ct,.green .cs,.green .ex{color:#173404}
+.green .ex{border-top-color:rgba(23,52,4,.2)}
+
+.pink{background:#ED93B1;border-color:#72243E}
+.pink .ct,.pink .cs,.pink .ex{color:#4B1528}
+.pink .ex{border-top-color:rgba(75,21,40,.2)}
+
+.gray{background:#D3D1C7;border-color:#444441}
+.gray .ct,.gray .cs,.gray .ex{color:#2C2C2A}
+.gray .ex{border-top-color:rgba(44,44,42,.2)}
+</style>
+
+<div class="w">
+
+<div class="ll">Event trigger layer <span class="badge bn">redesigned — replaces 15-min cron</span></div>
+<div class="sb">
+<p class="sbl">Push-based · zero polling · fires within seconds of a job posting</p>
+<div class="row">
+  <div class="card teal" onclick="this.classList.toggle('open')">
+    <p class="ct">Job alert emails <span class="badge bn">new</span></p>
+    <p class="cs">LinkedIn / Indeed alerts → dedicated Gmail inbox → Pub/Sub webhook → instant trigger</p>
+    <div class="ex"><ul>
+      <li>Set up LinkedIn Job Alert + Indeed Email Alert for target searches</li>
+      <li>Route to a dedicated Gmail address (never your personal inbox)</li>
+      <li>Gmail Pub/Sub fires a webhook the instant an email arrives</li>
+      <li>Email parsed for job URL + title — no scraping the job board at all</li>
+    </ul></div>
+  </div>
+  <div class="card teal" onclick="this.classList.toggle('open')">
+    <p class="ct">RSS / API feeds <span class="badge bn">new</span></p>
+    <p class="cs">Indeed Publisher API + LinkedIn Job API + Superfeedr WebSub push — event-driven, not polled</p>
+    <div class="ex"><ul>
+      <li>Subscribe to RSS feeds (Indeed, RemoteOK, Greenhouse) via Superfeedr aggregator</li>
+      <li>Superfeedr sends WebSub push notifications — no polling required</li>
+      <li>Official APIs used where available to stay within ToS</li>
+    </ul></div>
+  </div>
+  <div class="card teal" onclick="this.classList.toggle('open')">
+    <p class="ct">Career page watcher <span class="badge bn">new</span></p>
+    <p class="cs">Playwright DOM-hash watcher on target company /jobs pages — fires only on change, not on schedule</p>
+    <div class="ex"><ul>
+      <li>Stores a hash of the job listing section's DOM per company</li>
+      <li>Re-checks only on WebSocket heartbeat — not a cron</li>
+      <li>On hash change → extract new listings → push to event queue</li>
+      <li>One lightweight page load per trigger, not 96 scrapes/day</li>
+    </ul></div>
+  </div>
+</div>
+</div>
+
+<div class="arr">↓</div>
+
+<div class="ll">Agent 0 · Intake <span class="badge bn">new — one-time setup</span></div>
+<div class="row">
+  <div class="card purple" onclick="this.classList.toggle('open')">
+    <p class="ct">Resume &amp; experience ingestion</p>
+    <p class="cs">Parses resume PDF → PostgreSQL master experience DB → seeds Pinecone with interview Q&amp;A history</p>
+    <div class="ex"><ul>
+      <li>Claude Sonnet parses resume into structured JSON: roles, dates, bullets, tech stack</li>
+      <li>Writes to PostgreSQL <code>experiences</code>, <code>skills</code>, <code>projects</code> tables</li>
+      <li>Embeds past interview answers into Pinecone (namespace: interview-memory)</li>
+      <li>Re-run anytime you update your resume — idempotent upsert</li>
+    </ul></div>
+  </div>
+  <div class="card purple" onclick="this.classList.toggle('open')">
+    <p class="ct">Secrets vault bootstrap <span class="badge bs">security</span></p>
+    <p class="cs">HashiCorp Vault — API keys, portal credentials, LinkedIn session cookies, diversity answers</p>
+    <div class="ex"><ul>
+      <li>All secrets in Vault with short-lived dynamic tokens — never in env vars or PostgreSQL</li>
+      <li>Each agent requests its own scoped token at runtime (least-privilege)</li>
+      <li>LinkedIn session cookies rotated after each use, re-stored encrypted</li>
+      <li>EEO/diversity answers injected at form-fill time only — never at rest in plain DB</li>
+    </ul></div>
+  </div>
+</div>
+
+<div class="arr">↓</div>
+
+<div class="ll">Phase 1 · Discovery &amp; validation</div>
+<div class="row">
+  <div class="card teal" onclick="this.classList.toggle('open')">
+    <p class="ct">Agent 1 · Scout</p>
+    <p class="cs">Event-driven Playwright · HTML → structured JSON · GPT-4o-mini extractor</p>
+    <div class="ex"><ul>
+      <li>Triggered by event queue — no cron, no polling</li>
+      <li>Human behavior engine active: Bezier mouse, randomized delays, realistic UA</li>
+      <li>Extracts JD schema: title, skills, requirements, sponsorship signals</li>
+    </ul></div>
+  </div>
+  <div class="card amber" onclick="this.classList.toggle('open')">
+    <p class="ct">Duplicate guard <span class="badge bf">gap fixed</span></p>
+    <p class="cs">PostgreSQL unique constraint on (company, job_id) — checked before any further processing</p>
+    <div class="ex"><ul>
+      <li>If job already in DB with any status → drop and stop immediately</li>
+      <li>Prevents double-application if two alert sources fire for the same posting</li>
+      <li>Logged as "duplicate suppressed" in LangSmith</li>
+    </ul></div>
+  </div>
+  <div class="card teal" onclick="this.classList.toggle('open')">
+    <p class="ct">Agent 2 · Intel</p>
+    <p class="cs">USCIS Torch API · LCA lookup · H1B gate ≥ 0.7 · Glassdoor secondary signal</p>
+    <div class="ex"><ul>
+      <li>Pings USCIS Torch API for employer LCA filings in Herndon, VA</li>
+      <li>H1B probability &lt; 0.7 → log as "low probability" and halt pipeline</li>
+      <li>Secondary check: Glassdoor API for known sponsorship history</li>
+    </ul></div>
+  </div>
+</div>
+
+<div class="arr">↓</div>
+
+<div class="ll">Phase 2 · Generation</div>
+<div class="sb">
+<p class="sbl">Agent 3 · Architect — resume + cover letter + ATS loop</p>
+<div class="row">
+  <div class="card purple" onclick="this.classList.toggle('open')">
+    <p class="ct">Resume rewriter</p>
+    <p class="cs">Claude Sonnet · semantic search against JD · regex bold-match · LaTeX PDF render</p>
+    <div class="ex"><ul>
+      <li>Pulls relevant bullets from PostgreSQL via semantic search against JD embeddings</li>
+      <li>Rewrites bullets to match JD language — sourced from your real history only</li>
+      <li>Bolds technical skills that appear in JD requirements via regex</li>
+      <li>Renders to pixel-perfect PDF via python-texlive</li>
+    </ul></div>
+  </div>
+  <div class="card purple" onclick="this.classList.toggle('open')">
+    <p class="ct">ATS loop <span class="badge bf">hard cap: 3 iterations</span></p>
+    <p class="cs">Mock-ATS score → rewrite → retry · if score &lt; 90% after 3 attempts → manual review alert</p>
+    <div class="ex"><ul>
+      <li>Attempt 1–3: adjust keywords, retry ATS parser</li>
+      <li>After attempt 3 with score still &lt; 90%: log "needs manual review", fire Slack alert, halt</li>
+      <li>Never infinite-loops — token budget protected</li>
+    </ul></div>
+  </div>
+  <div class="card purple" onclick="this.classList.toggle('open')">
+    <p class="ct">Cover letter branch <span class="badge bf">gap fixed</span></p>
+    <p class="cs">Detects cover letter requirement from JD schema → Claude Sonnet generates tailored letter</p>
+    <div class="ex"><ul>
+      <li>GPT-4o-mini extracts requires_cover_letter boolean from JD schema</li>
+      <li>If true: 3-paragraph letter using master experience + JD context</li>
+      <li>Same tone-matching rules as resume — no generic filler</li>
+      <li>Rendered as PDF or plain text depending on portal</li>
+    </ul></div>
+  </div>
+</div>
+</div>
+
+<div class="arr">↓</div>
+
+<div class="ll">Human behavior engine <span class="badge bn">new — cross-cutting service used by Agents 1, 4, 5</span></div>
+<div class="sb">
+<p class="sbl">Every browser action indistinguishable from a real person</p>
+<div class="row">
+  <div class="card green" onclick="this.classList.toggle('open')">
+    <p class="ct">Fingerprint &amp; identity</p>
+    <p class="cs">playwright-extra stealth · residential proxy (Brightdata sticky session) · canvas randomization</p>
+    <div class="ex"><ul>
+      <li>playwright-extra + stealth plugin hides webdriver flag, normalizes headless JS APIs</li>
+      <li>Residential proxy rotation — sticky session per domain (same IP for full session)</li>
+      <li>Randomized viewport: 1366×768, 1440×900, or 1920×1080</li>
+      <li>Locale, timezone, accept-language match proxy geo</li>
+      <li>Canvas fingerprint randomization</li>
+    </ul></div>
+  </div>
+  <div class="card green" onclick="this.classList.toggle('open')">
+    <p class="ct">Behavioral timing</p>
+    <p class="cs">Gaussian delays (μ=1.2s σ=0.4s) · reading time simulation · business-hours gate (8am–9pm)</p>
+    <div class="ex"><ul>
+      <li>All waits drawn from Gaussian distribution — never fixed delays</li>
+      <li>Page reading time = word_count / 200 WPM before any action</li>
+      <li>Business hours gate: actions only 8am–9pm your timezone</li>
+      <li>Random micro-pauses 50–300ms mid-form (simulates thinking)</li>
+    </ul></div>
+  </div>
+  <div class="card green" onclick="this.classList.toggle('open')">
+    <p class="ct">Mouse &amp; keyboard sim</p>
+    <p class="cs">Bezier mouse paths · 45–65 WPM typing with occasional typo + backspace corrections</p>
+    <div class="ex"><ul>
+      <li>Mouse moves along Bezier curves — never teleports to coordinates</li>
+      <li>Typing speed 45–65 WPM drawn from distribution, not instant .fill()</li>
+      <li>1-in-50 chance of typo + backspace correction per field</li>
+      <li>Tab between fields, random scroll while "reading" before applying</li>
+    </ul></div>
+  </div>
+  <div class="card green" onclick="this.classList.toggle('open')">
+    <p class="ct">Session warm-up &amp; CAPTCHA <span class="badge bf">gap fixed</span></p>
+    <p class="cs">Pre-application browsing session · 2captcha fallback · human-in-the-loop Slack alert</p>
+    <div class="ex"><ul>
+      <li>Before applying: visit homepage, scroll, click 1–2 nav links to build real session history</li>
+      <li>CAPTCHA hit → 2captcha/Anti-Captcha API (1st retry)</li>
+      <li>CAPTCHA fails twice → pause agent + fire Slack alert + await manual clearance</li>
+      <li>Session cookies persisted and reused per domain (stored in Vault)</li>
+    </ul></div>
+  </div>
+</div>
+</div>
+
+<div class="arr">↓</div>
+
+<div class="ll">Phase 3 · Submission &amp; networking</div>
+<div class="row">
+  <div class="card coral" onclick="this.classList.toggle('open')">
+    <p class="ct">Agent 4 · Pilot</p>
+    <p class="cs">Browserbase + Computer Use · Skyvern form fill · diversity vault injection · emits submitted event</p>
+    <div class="ex"><ul>
+      <li>Human behavior engine active throughout entire session</li>
+      <li>Session bootstrap: load cookies from Vault → verify login → re-auth if stale</li>
+      <li>Computer Use identifies "Apply" button — CSS selector heuristic fallback</li>
+      <li>EEO/diversity answers injected from Vault only at fill time</li>
+      <li>Emits application.submitted event on success</li>
+    </ul></div>
+  </div>
+  <div class="card coral" onclick="this.classList.toggle('open')">
+    <p class="ct">Agent 5 · Networker <span class="badge bf">ToS risk mitigated</span></p>
+    <p class="cs">LinkedIn API primary · throwaway account scrape fallback · Claude Sonnet personalized DM</p>
+    <div class="ex"><ul>
+      <li>Primary: LinkedIn People Search API (official) for recruiter discovery</li>
+      <li>Fallback: dedicated throwaway account — rate-limited to &lt;8 profiles/hour, never personal</li>
+      <li>Claude Sonnet DM references specific JD detail + one genuine company insight</li>
+      <li>2–4 minute artificial reading delay before sending — not instant after application</li>
+      <li>DM content + timestamp saved to PostgreSQL for follow-up context</li>
+    </ul></div>
+  </div>
+</div>
+
+<div class="arr">↓</div>
+
+<div class="ll">Agent 6 · Follow-up &amp; learning <span class="badge bn">new</span></div>
+<div class="row">
+  <div class="card pink" onclick="this.classList.toggle('open')">
+    <p class="ct">Follow-up scheduler</p>
+    <p class="cs">Checks for DM reply after 5 days · Pinecone recall for context · max 1 follow-up per application</p>
+    <div class="ex"><ul>
+      <li>Daily EventBridge trigger checks for jobs in "applied" status with no reply after 5 days</li>
+      <li>Pinecone retrieves original DM so follow-up references it naturally</li>
+      <li>Sent from same session/account as original DM</li>
+      <li>Max 1 follow-up per application — never spams</li>
+    </ul></div>
+  </div>
+  <div class="card pink" onclick="this.classList.toggle('open')">
+    <p class="ct">Outcome feedback loop <span class="badge bf">gap fixed</span></p>
+    <p class="cs">Tracks resume version → interview rate · feeds back into Agent 3 rewrite strategy over time</p>
+    <div class="ex"><ul>
+      <li>PostgreSQL outcomes table: job_id, resume_version_id, ats_score, status, interview_date</li>
+      <li>Status: applied → replied → interview → offer → rejected</li>
+      <li>After 20+ applications: Agent 3 A/B tests rewrite strategies using outcome data</li>
+      <li>Nightly summary: which keyword patterns correlated with interview invites</li>
+    </ul></div>
+  </div>
+</div>
+
+<div class="arr">↓</div>
+
+<div class="ll">Observability &amp; cost control <span class="badge bf">all gaps fixed</span></div>
+<div class="row">
+  <div class="card blue" onclick="this.classList.toggle('open')">
+    <p class="ct">LangSmith tracing</p>
+    <p class="cs">Full agent run traces · token counts per node · Slack alerts on failure</p>
+    <div class="ex"><ul>
+      <li>Every LangGraph node traced in LangSmith — free tier covers this volume</li>
+      <li>Slack webhook fires on any agent failing after max retries</li>
+      <li>Daily summary: jobs found, applied, DMs sent, token spend</li>
+    </ul></div>
+  </div>
+  <div class="card blue" onclick="this.classList.toggle('open')">
+    <p class="ct">Token budget guardrail</p>
+    <p class="cs">Daily spend cap in PostgreSQL · auto-pause all agents if budget breached</p>
+    <div class="ex"><ul>
+      <li>Daily token budget decremented after each API call</li>
+      <li>Budget exceeded → all agent runs paused + Slack alert immediately</li>
+      <li>Agent 3 hard cap: 3 ATS rewrite iterations maximum</li>
+    </ul></div>
+  </div>
+  <div class="card blue" onclick="this.classList.toggle('open')">
+    <p class="ct">Cron infrastructure <span class="badge bf">gap fixed</span></p>
+    <p class="cs">APScheduler for local dev · AWS EventBridge + Lambda for production</p>
+    <div class="ex"><ul>
+      <li>Local: APScheduler embedded in LangGraph app — zero infra overhead</li>
+      <li>Production: AWS EventBridge rule → Lambda → pushes to event queue</li>
+      <li>Agent 6 follow-up: daily EventBridge rule at 9am checks pending follow-ups</li>
+    </ul></div>
+  </div>
+</div>
+
+<p class="hint">Click any card to expand implementation details</p>
+</div>
