@@ -196,8 +196,9 @@ footer{background:var(--ink);border-top:1px solid rgba(255,255,255,.07);padding:
 .footer-links a:hover{color:rgba(255,255,255,.7)}
 .footer-legal{font-size:12px;color:rgba(255,255,255,.2)}
 
-/* ANIMATIONS */
-.fade-up{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}
+/* ANIMATIONS - content visible by default, animation is progressive enhancement */
+.fade-up{opacity:1;transform:translateY(0);transition:opacity .6s ease,transform .6s ease}
+.fade-up.will-animate{opacity:0;transform:translateY(24px)}
 .fade-up.visible{opacity:1;transform:translateY(0)}
 
 /* RESPONSIVE */
@@ -225,7 +226,7 @@ footer{background:var(--ink);border-top:1px solid rgba(255,255,255,.07);padding:
       <a href="#features">Features</a>
       <a href="#pricing">Pricing</a>
       <a href="#tech">Technology</a>
-      <a href="mailto:hello@genupath.fit">Contact</a>
+      <a href="mailto:founder@genupath.fit">Contact</a>
     </div>
     <a href="#waitlist" class="nav-cta">Join waitlist</a>
   </div>
@@ -352,7 +353,7 @@ footer{background:var(--ink);border-top:1px solid rgba(255,255,255,.07);padding:
     <div class="feature-card">
       <div class="fc-icon"><svg fill="none" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7" stroke-width="1.5"/><path d="M10 6v4l3 3" stroke-width="1.5" stroke-linecap="round"/></svg></div>
       <div class="fc-title">Hiring timeline intelligence</div>
-      <div class="fc-desc">See how long this specific company takes to respond, progress candidates, and make offers — based on real data from GenuPath users who went through their pipeline. "Stripe responds in ~8 days. Goldman averages 34 days." Know before you apply, not after you've been waiting for weeks.</div>
+      <div class="fc-desc">See how long a specific company takes to respond, progress candidates, and make offers. As GenuPath grows, this data gets richer — built from real outcomes, not guesses. Know before you apply, not after you've been waiting for weeks.</div>
       <div class="fc-tags">
         <span class="fc-tag" style="background:var(--teal-l);color:var(--teal);border:1px solid rgba(0,122,110,.15)">Outcome data</span>
         <span class="fc-tag" style="background:var(--s3);color:var(--ink3);border:1px solid var(--border)">Genuinely novel</span>
@@ -362,7 +363,7 @@ footer{background:var(--ink);border-top:1px solid rgba(255,255,255,.07);padding:
     <div class="feature-card">
       <div class="fc-icon"><svg fill="none" viewBox="0 0 20 20"><path d="M17 6H3M13 10H3M10 14H3" stroke-width="1.5" stroke-linecap="round"/></svg></div>
       <div class="fc-title">Sponsorship intelligence</div>
-      <div class="fc-desc">Built on the DOL Office of Foreign Labor Certification H1B Disclosure Data — the real government dataset. Not guesses, not outdated blog posts. We show you how many LCAs this employer filed in the last 2 years, at what wage level, and what % of GenuPath users in similar roles received sponsorship. Sponsorship intelligence built on real government data — not guesses.</div>
+      <div class="fc-desc">Built on the DOL Office of Foreign Labor Certification H1B Disclosure Data — the real government dataset. Not guesses, not outdated blog posts. We show you how many LCAs this employer filed in the last 2 years, at what wage level, and the historical sponsorship approval rates for similar roles. Sponsorship intelligence built on real government data — not guesses.</div>
       <div class="fc-tags">
         <span class="fc-tag" style="background:var(--teal-l);color:var(--teal);border:1px solid rgba(0,122,110,.15)">DOL OFLC data</span>
         <span class="fc-tag" style="background:var(--teal-l);color:var(--teal);border:1px solid rgba(0,122,110,.15)">F1 · OPT · H4</span>
@@ -372,7 +373,7 @@ footer{background:var(--ink);border-top:1px solid rgba(255,255,255,.07);padding:
     <div class="feature-card">
       <div class="fc-icon"><svg fill="none" viewBox="0 0 20 20"><path d="M16 8c0 4-6 9-6 9S4 12 4 8a6 6 0 1112 0z" stroke-width="1.5"/><circle cx="10" cy="8" r="2" stroke-width="1.5"/></svg></div>
       <div class="fc-title">Ghosting probability</div>
-      <div class="fc-desc">We track every application submitted through GenuPath and whether the candidate ever received a response. Over time, this becomes the most honest metric in hiring: "Stripe responds to 78% of applicants. Goldman responds to 22%." You see this before applying — not after waiting 6 weeks in silence.</div>
+      <div class="fc-desc">GenuPath will track every application submitted through the platform and whether the candidate ever received a response. Over time, this becomes the most honest metric in hiring — a real responsiveness score for every employer. You'll see this before applying, not after waiting 6 weeks in silence.</div>
       <div class="fc-tags">
         <span class="fc-tag" style="background:var(--s3);color:var(--ink3);border:1px solid var(--border)">Gets better with users</span>
       </div>
@@ -381,7 +382,7 @@ footer{background:var(--ink);border-top:1px solid rgba(255,255,255,.07);padding:
     <div class="feature-card">
       <div class="fc-icon"><svg fill="none" viewBox="0 0 20 20"><path d="M3 5h14M3 10h10M3 15h7" stroke-width="1.5" stroke-linecap="round"/></svg></div>
       <div class="fc-title">AI resume tailoring with a truthfulness guarantee</div>
-      <div class="fc-desc">Claude Sonnet rewrites your resume bullets to match the exact JD language — improving ATS pass-through rates by an average of 18 percentage points. Every output is validated against your actual work history. The system cannot add skills, companies, or achievements you don't have. No resume fraud risk, ever.</div>
+      <div class="fc-desc">Claude Sonnet rewrites your resume bullets to match the exact JD language — designed to significantly improve ATS pass-through rates. Every output is validated against your actual work history. The system cannot add skills, companies, or achievements you don't have. No resume fraud risk, ever.</div>
       <div class="fc-tags">
         <span class="fc-tag" style="background:var(--teal-l);color:var(--teal);border:1px solid rgba(0,122,110,.15)">Claude Sonnet</span>
         <span class="fc-tag" style="background:var(--teal-l);color:var(--teal);border:1px solid rgba(0,122,110,.15)">Guardrails AI</span>
@@ -393,7 +394,7 @@ footer{background:var(--ink);border-top:1px solid rgba(255,255,255,.07);padding:
         <div>
           <div class="fc-icon"><svg fill="none" viewBox="0 0 20 20"><circle cx="8" cy="8" r="5" stroke-width="1.5"/><circle cx="12" cy="12" r="5" stroke-width="1.5"/></svg></div>
           <div class="fc-title">Company health signal</div>
-          <div class="fc-desc">Before you spend 3 hours tailoring an application, see: funding runway from Crunchbase, layoff history from public records, Glassdoor culture trend (improving or declining over 12 months), and whether any GenuPath users had offers rescinded from this company. The signal that prevents you from joining a company about to go through layoffs the month after you start.</div>
+          <div class="fc-desc">Before you spend 3 hours tailoring an application, see: funding runway from Crunchbase, layoff history from public records, and Glassdoor culture trend (improving or declining over 12 months). The signal that prevents you from joining a company about to go through layoffs the month after you start.</div>
         </div>
         <div style="background:var(--s2);border-radius:14px;padding:20px;border:1px solid var(--border)">
           <div style="font-size:11px;font-family:var(--mono);color:var(--ink4);letter-spacing:.07em;text-transform:uppercase;margin-bottom:14px">Company health · Vercel</div>
@@ -401,9 +402,8 @@ footer{background:var(--ink);border-top:1px solid rgba(255,255,255,.07);padding:
             <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px"><span style="color:var(--ink3)">Last funding</span><span style="color:var(--ink);font-weight:500">Series D · 2024</span></div>
             <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px"><span style="color:var(--ink3)">Layoff history</span><span style="color:#b36b00;font-weight:500">1 round · Jan 2024</span></div>
             <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px"><span style="color:var(--ink3)">Glassdoor trend</span><span style="color:#2d7a3a;font-weight:500">↑ Improving 6mo</span></div>
-            <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px"><span style="color:var(--ink3)">Rescinded offers</span><span style="color:#2d7a3a;font-weight:500">None on record</span></div>
             <div style="height:1px;background:var(--border);margin:4px 0"></div>
-            <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:600"><span>GenuPath rating</span><span style="color:#b36b00">⚠ Watch runway</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px"><span style="color:var(--ink3)">H1B LCAs filed</span><span style="color:var(--ink);font-weight:500">127 · Last 2yr</span></div>
           </div>
         </div>
       </div>
@@ -418,22 +418,22 @@ footer{background:var(--ink);border-top:1px solid rgba(255,255,255,.07);padding:
   <p style="font-size:16px;color:var(--ink3);line-height:1.6;font-weight:300">Whether you are actively job hunting, passively exploring, or hiring at scale — GenuPath gives you the honest data to make better decisions.</p>
   <div class="fw-grid">
     <div class="fw-card">
-      <div class="fwc-avatar" style="background:#e0f4f1;color:var(--teal)">JS</div>
-      <div class="fwc-name">Priya S.</div>
-      <div class="fwc-role">MS Computer Science · Actively job hunting</div>
-      <div class="fwc-quote">"I was applying to 20 jobs a week and hearing back from 2. GenuPath showed me Goldman Sachs ghosts 78% of applicants. I stopped wasting time there and focused where I had real odds. My interview rate went from 10% to 34% in three weeks."</div>
+      <div class="fwc-avatar" style="background:#e0f4f1;color:var(--teal)">🎓</div>
+      <div class="fwc-name">New grads & career changers</div>
+      <div class="fwc-role">Applying to 20+ roles a week with low response rates</div>
+      <div class="fwc-quote">Stop applying blindly. GenuPath shows which companies actually respond and where your profile fits best — so you focus your energy where it counts.</div>
     </div>
     <div class="fw-card">
-      <div class="fwc-avatar" style="background:#eaf5ec;color:#2d7a3a">H1</div>
-      <div class="fwc-name">Ravi M.</div>
-      <div class="fwc-role">Senior Engineer · Senior Engineer · Actively searching</div>
-      <div class="fwc-quote">"I stopped guessing and started applying strategically. GenuPath shows me which companies actually respond and which roles I genuinely fit. My interview rate tripled in three weeks."</div>
+      <div class="fwc-avatar" style="background:#eaf5ec;color:#2d7a3a">🛂</div>
+      <div class="fwc-name">F1 / OPT / H4 visa candidates</div>
+      <div class="fwc-role">Need sponsorship but can't tell which employers actually sponsor</div>
+      <div class="fwc-quote">Real DOL data shows exactly how many LCAs each employer filed, at what wage level. No more guessing which companies sponsor — see the numbers before you apply.</div>
     </div>
     <div class="fw-card">
-      <div class="fwc-avatar" style="background:#f3eefb;color:#6535a8">HR</div>
-      <div class="fwc-name">Alex T.</div>
-      <div class="fwc-role">Engineering Manager · Series B startup · Hiring 6 roles</div>
-      <div class="fwc-quote">"We posted a senior engineer role and got 400 applications, 90% irrelevant. GenuPath candidates arrive pre-scored against our JD. The first 5 we reviewed were all strong. We hired 2 of them. The ROI is obvious."</div>
+      <div class="fwc-avatar" style="background:#f3eefb;color:#6535a8">🏢</div>
+      <div class="fwc-name">Hiring teams drowning in noise</div>
+      <div class="fwc-role">Getting hundreds of applications, most irrelevant</div>
+      <div class="fwc-quote">GenuPath pre-scores candidates against your JD before they apply. Your pipeline gets smaller but dramatically more relevant — saving hours of screening time.</div>
     </div>
   </div>
 </div>
@@ -543,9 +543,9 @@ footer{background:var(--ink);border-top:1px solid rgba(255,255,255,.07);padding:
 <!-- WAITLIST -->
 <section class="waitlist-section" id="waitlist">
   <div class="wl-inner">
-    <div class="wl-count"><div class="wl-count-dot"></div>847 people on the waitlist</div>
+    <div class="wl-count"><div class="wl-count-dot"></div>Building in public · Launching soon</div>
     <h2 class="wl-h2">Be first when we <em>launch</em></h2>
-    <p class="wl-sub">We're building in public and shipping fast. Join the waitlist and get early access, a free Pro trial for the first 500 users, and weekly behind-the-scenes updates.</p>
+    <p class="wl-sub">We're building in public and shipping fast. Join the waitlist and get early access, a free Pro trial, and weekly behind-the-scenes updates.</p>
     <div class="wl-form">
       <input class="wl-input" type="email" id="wl-email" placeholder="your@email.com">
       <button class="wl-btn" onclick="joinWaitlist()">Get early access</button>
@@ -560,7 +560,7 @@ footer{background:var(--ink);border-top:1px solid rgba(255,255,255,.07);padding:
     <div class="footer-links">
       <a href="#">Privacy</a>
       <a href="#">Terms</a>
-      <a href="mailto:hello@genupath.fit">Contact</a>
+      <a href="mailto:founder@genupath.fit">Contact</a>
       <a href="#">Twitter</a>
       <a href="#">LinkedIn</a>
     </div>
@@ -581,12 +581,14 @@ function joinWaitlist(){
 }
 document.getElementById('wl-email').addEventListener('keydown',e=>{if(e.key==='Enter')joinWaitlist();});
 
-// Scroll animations
-const observer=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:.1});
-document.querySelectorAll('.fade-up').forEach(el=>observer.observe(el));
+// Scroll animations — progressive enhancement: content visible by default
+const fadeEls=document.querySelectorAll('.fade-up');
+fadeEls.forEach(el=>el.classList.add('will-animate'));
+const observer=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');e.target.classList.remove('will-animate');}});},{threshold:.1});
+fadeEls.forEach(el=>observer.observe(el));
 
 // Smooth scroll for nav links
-document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click',e=>{const id=a.getAttribute('href');if(id==='#')return;const el=document.querySelector(id);if(el){e.preventDefault();el.scrollIntoView({behavior:'smooth',block:'start'});}});});
+document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click',e=>{const id=a.getAttribute('href');if(id&&id.length>1){e.preventDefault();const el=document.querySelector(id);if(el)el.scrollIntoView({behavior:'smooth'});}});});
 </script>
 </body>
 </html>
